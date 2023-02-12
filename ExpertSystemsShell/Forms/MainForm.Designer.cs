@@ -202,6 +202,7 @@ namespace ExpertSystemsShell
             this.RulesListView.TabIndex = 8;
             this.RulesListView.UseCompatibleStateImageBehavior = false;
             this.RulesListView.View = System.Windows.Forms.View.Details;
+            this.RulesListView.SelectedIndexChanged += new System.EventHandler(this.RulesListView_SelectedIndexChanged);
             // 
             // ActionPartGroupBox
             // 
@@ -280,6 +281,7 @@ namespace ExpertSystemsShell
             this.EditRuleButton.TabIndex = 1;
             this.EditRuleButton.Text = "Изменить";
             this.EditRuleButton.UseVisualStyleBackColor = false;
+            this.EditRuleButton.Click += new System.EventHandler(this.EditRuleButton_Click);
             // 
             // AddRuleButton
             // 

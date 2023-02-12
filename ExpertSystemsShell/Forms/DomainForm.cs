@@ -31,6 +31,7 @@ public partial class DomainForm : Form
         _usedNames = usedNames;
         _values = domain.Values;
         Domain = domain;
+
         InitializeComponents();
     }
 
@@ -163,7 +164,7 @@ public partial class DomainForm : Form
     {
         if (Domain is null)
         {
-            Domain = new(name, values);
+            Domain = new Domain(name, values);
             return;
         }
 

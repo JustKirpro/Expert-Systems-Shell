@@ -40,19 +40,23 @@ namespace ExpertSystemsShell.Forms
             // 
             // VariableComboBox
             // 
+            this.VariableComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.VariableComboBox.FormattingEnabled = true;
             this.VariableComboBox.Location = new System.Drawing.Point(12, 22);
             this.VariableComboBox.Name = "VariableComboBox";
             this.VariableComboBox.Size = new System.Drawing.Size(665, 40);
             this.VariableComboBox.TabIndex = 0;
+            this.VariableComboBox.SelectedIndexChanged += new System.EventHandler(this.VariableComboBox_SelectedIndexChanged);
             // 
             // ValueComboBox
             // 
+            this.ValueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ValueComboBox.FormattingEnabled = true;
             this.ValueComboBox.Location = new System.Drawing.Point(12, 137);
             this.ValueComboBox.Name = "ValueComboBox";
             this.ValueComboBox.Size = new System.Drawing.Size(735, 40);
             this.ValueComboBox.TabIndex = 1;
+            this.ValueComboBox.SelectedIndexChanged += new System.EventHandler(this.ValueComboBox_SelectedIndexChanged);
             // 
             // VariableAddButton
             // 
@@ -81,6 +85,7 @@ namespace ExpertSystemsShell.Forms
             this.OkButton.TabIndex = 6;
             this.OkButton.Text = "ОК";
             this.OkButton.UseVisualStyleBackColor = true;
+            this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // EqualSignLabel
             // 

@@ -109,6 +109,7 @@ namespace ExpertSystemsShell.Forms
             this.CondtionPartEditButton.TabIndex = 4;
             this.CondtionPartEditButton.Text = "Изменить";
             this.CondtionPartEditButton.UseVisualStyleBackColor = true;
+            this.CondtionPartEditButton.Click += new System.EventHandler(this.CondtionPartEditButton_Click);
             // 
             // CondtionPartAddButton
             // 

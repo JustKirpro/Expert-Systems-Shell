@@ -8,18 +8,27 @@ namespace ExpertSystemsShell.Forms
     {
         public Rule Rule { get; private set; }
 
-        public RuleForm()
+        private Variables _variables;
+
+        private Domains _domains;
+
+        public RuleForm(Variables variables, Domains domains)
         {
             InitializeComponent();
             Rule = new Rule();
             Text = "Создание нового правила";
+            _variables= variables;
+            _domains = domains;
         }
 
-        public RuleForm(Rule currentRule)
+        public RuleForm(Variables variables, Domains domains, Rule currentRule)
         {
             InitializeComponent();
             Rule = currentRule;
             Text = "Редактирование правила";
+
+            _variables = variables;
+            _domains = domains;
         }
 
         /*private void InitializeListBoxes()
@@ -33,8 +42,13 @@ namespace ExpertSystemsShell.Forms
 
         private void CondtionPartAddButton_Click(object sender, EventArgs e)
         {
-            using var factForm = new FactForm();
+            using var factForm = new FactForm(_variables, _domains);
             var result = factForm.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                var fact = factForm.Fact;
+            }
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
@@ -45,6 +59,12 @@ namespace ExpertSystemsShell.Forms
         private void OkButton_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void CondtionPartEditButton_Click(object sender, EventArgs e)
+        {
+            //using var factForm = new FactForm(_variables, _domains, new Fact(_variables.g, "100");
+           // var result = factForm.ShowDialog();
         }
     }
 }

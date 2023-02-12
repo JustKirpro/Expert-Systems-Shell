@@ -18,14 +18,11 @@ public class Variable
         _ => "Неизвестный",
     };
 
-    public Variable(string name, Domain domain, VariableType type)
+    public Variable(string name, Domain domain, VariableType type, string? question = null)
     {
         Name = name;
+        Question = question;
         Domain = domain;
         Type = type;
     }
-
-    public Variable(string name, string question, Domain domain, VariableType type) : this(name, domain, type) => Question = question;
-
-    public Variable() { }
 }

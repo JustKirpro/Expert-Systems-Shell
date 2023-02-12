@@ -54,9 +54,9 @@ public partial class MainForm : Form
         _domains.Add(domain1);
         _domains.Add(domain2);
 
-        var variable1 = new Variable { Name = "Курение", Domain = domain1, Question = null, Type = VariableType.Inferred };
-        var variable2 = new Variable { Name = "Рост", Domain = domain2, Question = "Мяу", Type = VariableType.Requested };
-        var variable3 = new Variable { Name = "Вес", Domain = domain2, Question = null, Type = VariableType.Requested };
+        var variable1 = new Variable("Курение", domain1, VariableType.Inferred, null);
+        var variable2 = new Variable("Рост", domain2, VariableType.Requested, "Мяу");
+        var variable3 = new Variable("Вес", domain2, VariableType.Requested);
 
         _variables.Add(variable1);
         _variables.Add(variable2);
@@ -147,13 +147,35 @@ public partial class MainForm : Form
 
     private void AddRuleButton_Click(object sender, EventArgs e)
     {
-        using var ruleForm = new RuleForm();
+        using var ruleForm = new RuleForm(_variables, _domains);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
 
         }
+    }
+
+    private void EditRuleButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = RulesListView.SelectedItems[0];
+        var variable = selectedItem.Tag as Rule;
+        var usedNames = _variables.GetNames();
+
+        //using var ruleForm = new RuleForm(usedNames, variable!, _domains);
+        //var result = variableForm.ShowDialog();
+
+        //if (result == DialogResult.OK)
+        {
+            //var newDomain = domainForm.Domain;
+            //_domains.Add(newDomain);
+            //AddDomainToListView(newDomain);
+        }
+    }
+
+    private void RulesListView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
     }
 
     #endregion

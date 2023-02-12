@@ -57,9 +57,9 @@ public partial class VariableForm : Form
         }
 
         var domain = GetDomain();
-        VariableType variableType = GetVariableType();
+        var variableType = GetVariableType();
 
-        SetVariable(name, question, domain, variableType);
+        SetVariable(name, domain, variableType, question);
         DialogResult = DialogResult.OK;
     }
 
@@ -72,14 +72,24 @@ public partial class VariableForm : Form
 
         if (result == DialogResult.OK)
         {
-            var newDomain = domainForm.Domain;
-            _domains.Add(newDomain);
+            var domain = domainForm.Domain;
+            _domains.Add(domain);
 
-            DomainComboBox.SelectedItem = newDomain;
+            AddDomainToComboBox(domain);
         }
     }
 
     private void VariableNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
+
+    private void QuestionTextBox_TextChanged(object sender, EventArgs e)
+    {
+        var question = GetQuestion();
+
+        if (!string.IsNullOrWhiteSpace(question))
+        {
+            _questionText = QuestionTextBox.Text.Trim();
+        }
+    }
 
     private void DomainComboBox_SelectedIndexChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
@@ -89,22 +99,18 @@ public partial class VariableForm : Form
 
     private void RequestedInferredOption_CheckedChanged(object sender, EventArgs e) => UpdateRadioButtons();
 
-    private void SetVariable(string name, string? question, Domain domain, VariableType variableType)
+    private void SetVariable(string name, Domain domain, VariableType variableType, string? question)
     {
         if (Variable is null)
         {
-            Variable = question is null ? new(name, domain, variableType) : new(name, question, domain, variableType);
+            Variable = new Variable(name, domain, variableType, question);
             return;
         }
 
         Variable.Name = name;
         Variable.Domain = domain;
         Variable.Type = variableType;
-
-        if (question is not null)
-        {
-            Variable.Question = question;
-        }
+        Variable.Question = question;
     }
 
     private string GetName() => VariableNameTextBox.Text.Trim();
@@ -126,7 +132,7 @@ public partial class VariableForm : Form
     private Domain GetDomain()
     {
         var name = DomainComboBox.SelectedItem.ToString()!;
-        return _domains.GetDomainByName(name)!;
+        return _domains.GetByName(name)!;
     }
 
     private VariableType GetVariableType()
@@ -173,17 +179,17 @@ public partial class VariableForm : Form
 
     private void InitializeRadioButtons()
     {
-        if (Variable.Type == VariableType.Requested)
+        switch (Variable.Type)
         {
-            RequestedOption.Checked = true;
-        }
-        else if (Variable.Type == VariableType.Inferred)
-        {
-            InferredOption.Checked = true;
-        }
-        else
-        {
-            RequestedInferredOption.Checked = true;
+            case VariableType.Requested:
+                RequestedOption.Checked = true;
+                return;
+            case VariableType.Inferred:
+                InferredOption.Checked = true;
+                return;
+            case VariableType.RequestedInferred:
+                RequestedInferredOption.Checked = true;
+                return;
         }
     }
 
@@ -201,26 +207,15 @@ public partial class VariableForm : Form
 
     private void UpdateRadioButtons()
     {
-        if (IsQuestionAvailable())
-        {
-            QuestionTextBox.Text = _questionText;
-        }
-        else
-        {
-            QuestionTextBox.Text = string.Empty;
-        }
+        QuestionTextBox.Text = IsQuestionAvailable() ? _questionText : string.Empty;
 
         UpdateQuestionBoxAvailability();
         UpdateOkButtonAvailability();
     }
 
-    private void QuestionTextBox_TextChanged(object sender, EventArgs e)
+    private void AddDomainToComboBox(Domain domain)
     {
-        var question = GetQuestion();
-
-        if (!string.IsNullOrWhiteSpace(question))
-        {
-            _questionText = QuestionTextBox.Text.Trim();
-        }
+        DomainComboBox.Items.Add(domain.Name);
+        DomainComboBox.SelectedItem = domain.Name;
     }
 }
