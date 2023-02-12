@@ -45,8 +45,8 @@ public partial class MainForm : Form
 
     private void PopulateLists()
     {
-        var domain1 = new Domain { Name = "Да / Нет1", Values = new List<string>() { "Да", "Нет" } };
-        var domain2 = new Domain { Name = "Высокий / Средний / Низкий1", Values = new List<string>() { "Высокий", "Средний", "Низкий" } };
+        var domain1 = new Domain("Да / Нет1", new List<string>() { "Да", "Нет" });
+        var domain2 = new Domain("Высокий / Средний / Низкий1", new List<string>() { "Высокий", "Средний", "Низкий" });
 
         _domains2.Add(domain1);
         _domains2.Add(domain2);
@@ -69,19 +69,19 @@ public partial class MainForm : Form
         var rule1 = new Rule
         {
             Name = "R1",
-            Explanation = "Meow",
+            Reason = "Meow",
             CondtionPart =
             new List<Fact> { new Fact { Variable = variable1, Value = "Да" }, new Fact { Variable = variable2, Value = "Средний" } },
-            ActionPart = new Fact { Variable = variable3, Value = "Средний" }
+            ActionPart = new List<Fact> { new Fact { Variable = variable3, Value = "Средний" } }
         };
 
         var rule2 = new Rule
         {
             Name = "R2",
-            Explanation = "Woof",
+            Reason = "Woof",
             CondtionPart =
             new List<Fact> { new Fact { Variable = variable1, Value = "Нет" }, new Fact { Variable = variable2, Value = "Средний" } },
-            ActionPart = new Fact { Variable = variable3, Value = "Высокий" }
+            ActionPart = new List<Fact> { new Fact { Variable = variable3, Value = "Высокий" } }
         };
            
         _rules.Add(rule1);

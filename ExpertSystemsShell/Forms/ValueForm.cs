@@ -10,31 +10,38 @@ public partial class ValueForm : Form
 
     public string Value { get; private set; }
 
-    public ValueForm(List<string> usedValues, string domainValue)
+    public ValueForm(List<string> usedValues, string value)
     {
         InitializeComponent();
-        ValueTextBox.Text = domainValue;
+        ValueTextBox.Text = value;
 
         _usedValues = usedValues;
-        Value = domainValue;
-    }
-
-    private void ValueTextBox_TextChanged(object sender, EventArgs e)
-    {
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(ValueTextBox.Text);
+        Value = value;
     }
 
     private void OkButton_Click(object sender, EventArgs e)
     {
-        var value = ValueTextBox.Text;
+        var value = GetValue();
 
-        if (_usedValues.Contains(value) && value != Value)
+        if (IsValueUsed(value))
         {
-            MessageBox.Show("Данное значение уже есть в домене", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowErrorMessageBox("Данное значение уже есть в домене");
             return;
         }
 
         Value = value;
         DialogResult = DialogResult.OK;
     }
+
+    private void ValueTextBox_TextChanged(object sender, EventArgs e)
+    {
+        var value = GetValue();
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(value);
+    }
+
+    private string GetValue() => ValueTextBox.Text.Trim();
+
+    private bool IsValueUsed(string value) => _usedValues.Contains(value) && value != Value;
+
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

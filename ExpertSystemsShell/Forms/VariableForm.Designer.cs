@@ -161,6 +161,7 @@
             this.QuestionTextBox.Name = "QuestionTextBox";
             this.QuestionTextBox.Size = new System.Drawing.Size(723, 110);
             this.QuestionTextBox.TabIndex = 1;
+            this.QuestionTextBox.TextChanged += new System.EventHandler(this.QuestionTextBox_TextChanged);
             // 
             // CancelButton
             // 

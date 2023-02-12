@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace ExpertSystemsShell.Entities;
 
 public class Rule
 {
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 
-    public string? Explanation { get; set; }
+    public string? Reason { get; set; }
 
-    public List<Fact> CondtionPart { get; set; } = new List<Fact>();
+    public List<Fact> CondtionPart { get; set; }
     
-    public Fact ActionPart { get; set; } = null!;
+    public List<Fact> ActionPart { get; set; }
+
+    public Rule(string name, List<Fact> condtionPart, List<Fact> actionPart)
+    {
+        Name = name;
+        CondtionPart = condtionPart;
+        ActionPart = actionPart;
+    }
+
+    public Rule(string name, string reason, List<Fact> condtionPart, List<Fact> actionPart) : this(name, condtionPart, actionPart) => Reason = reason;
+
+    public Rule() { }
 
     public override string ToString()
     {

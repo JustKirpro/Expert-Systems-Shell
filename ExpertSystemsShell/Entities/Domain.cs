@@ -5,9 +5,9 @@ namespace ExpertSystemsShell.Entities;
 
 public class Domain
 {
-    public string Name { get; init; } = null!;
+    public string Name { get; set; } = string.Empty;
 
-    public List<string> Values { get; init; } = new List<string>();
+    public List<string> Values { get; set; } = new List<string>();
 
     public string FormattedValues
     {
@@ -23,5 +23,11 @@ public class Domain
 
             return stringBuilder.ToString()[..^2];
         }
+    }
+
+    public Domain(string name, List<string> values)
+    {
+        Name = name;
+        Values = values;
     }
 }
