@@ -8,14 +8,7 @@ namespace ExpertSystemsShell;
 
 public partial class MainForm : Form
 {
-    private readonly List<Domain> _domains2 = new();
-
-    private readonly Domains _domains = new();
-
-    private readonly Variables _variables = new();
-
-    private readonly List<Variable> _variables2 = new();
-    private readonly List<Rule> _rules = new();
+    private readonly ExpertSystemShell _expertSystemShell = new();
 
     public MainForm()
     {
@@ -48,49 +41,28 @@ public partial class MainForm : Form
         var domain1 = new Domain("Да / Нет1", new List<string>() { "Да", "Нет" });
         var domain2 = new Domain("Высокий / Средний / Низкий1", new List<string>() { "Высокий", "Средний", "Низкий" });
 
-        _domains2.Add(domain1);
-        _domains2.Add(domain2);
-
-        _domains.Add(domain1);
-        _domains.Add(domain2);
+        _expertSystemShell.Domains.Add(domain1);
+        _expertSystemShell.Domains.Add(domain2);
 
         var variable1 = new Variable("Курение", domain1, VariableType.Inferred, null);
         var variable2 = new Variable("Рост", domain2, VariableType.Requested, "Мяу");
         var variable3 = new Variable("Вес", domain2, VariableType.Requested);
 
-        _variables.Add(variable1);
-        _variables.Add(variable2);
-        _variables.Add(variable3);
+        _expertSystemShell.Variables.Add(variable1);
+        _expertSystemShell.Variables.Add(variable2);
+        _expertSystemShell.Variables.Add(variable3);
 
-        _variables2.Add(variable1);
-        _variables2.Add(variable2);
-        _variables2.Add(variable3);
+        var rule1 = new Rule("R1", "Meow", new List<Fact> { new Fact { Variable = variable1, Value = "Да" }, new Fact { Variable = variable2, Value = "Средний" } }, new List<Fact> { new Fact { Variable = variable3, Value = "Средний" } });
 
-        var rule1 = new Rule
-        {
-            Name = "R1",
-            Reason = "Meow",
-            CondtionPart =
-            new List<Fact> { new Fact { Variable = variable1, Value = "Да" }, new Fact { Variable = variable2, Value = "Средний" } },
-            ActionPart = new List<Fact> { new Fact { Variable = variable3, Value = "Средний" } }
-        };
-
-        var rule2 = new Rule
-        {
-            Name = "R2",
-            Reason = "Woof",
-            CondtionPart =
-            new List<Fact> { new Fact { Variable = variable1, Value = "Нет" }, new Fact { Variable = variable2, Value = "Средний" } },
-            ActionPart = new List<Fact> { new Fact { Variable = variable3, Value = "Высокий" } }
-        };
+        var rule2 = new Rule("R2", "Woof", new List<Fact> { new Fact { Variable = variable1, Value = "Нет" }, new Fact { Variable = variable2, Value = "Средний" } }, new List<Fact> { new Fact { Variable = variable3, Value = "Высокий" } });
            
-        _rules.Add(rule1);
-        _rules.Add(rule2);
+        _expertSystemShell.Rules.Add(rule1);
+        _expertSystemShell.Rules.Add(rule2);
     }
 
     private void InitializeListViews()
     {
-        foreach (var rule in _rules)
+        foreach (var rule in _expertSystemShell.Rules)
         {
             var listViewItem = new ListViewItem(rule.Name)
             {
@@ -102,7 +74,7 @@ public partial class MainForm : Form
             RulesListView.Items.Add(listViewItem);
         }
 
-        foreach (var variable in _variables2)
+        foreach (var variable in _expertSystemShell.Variables)
         {
             var listViewItem = new ListViewItem(variable.Name)
             {
@@ -116,7 +88,7 @@ public partial class MainForm : Form
         }
 
 
-        foreach (var domain in _domains2)
+        foreach (var domain in _expertSystemShell.Domains)
         {
             var listViewItem = new ListViewItem(domain.Name)
             {
@@ -129,9 +101,24 @@ public partial class MainForm : Form
         }
     }
 
-    #region Menu
+    #region MenuFile
+
+    private void MenuFileNew_Click(object sender, EventArgs e)
+    {
+
+    }
 
     private void MenuFileOpen_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void MenuFileSave_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void MenuFileSaveAs_Click(object sender, EventArgs e)
     {
 
     }
@@ -143,11 +130,25 @@ public partial class MainForm : Form
 
     #endregion
 
+    #region MenuConsultation
+
+    private void MenuConsultationStart_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void MenuConsultationExplain_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    #endregion
+
     #region RulesTab
 
     private void AddRuleButton_Click(object sender, EventArgs e)
     {
-        using var ruleForm = new RuleForm(_variables, _domains);
+        using var ruleForm = new RuleForm(_expertSystemShell.Variables, _expertSystemShell.Domains);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -160,7 +161,7 @@ public partial class MainForm : Form
     {
         var selectedItem = RulesListView.SelectedItems[0];
         var variable = selectedItem.Tag as Rule;
-        var usedNames = _variables.GetNames();
+        var usedNames = _expertSystemShell.Rules.GetNames();
 
         //using var ruleForm = new RuleForm(usedNames, variable!, _domains);
         //var result = variableForm.ShowDialog();
@@ -175,7 +176,8 @@ public partial class MainForm : Form
 
     private void RulesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
-
+        var isAnyItemSelected = RulesListView.SelectedItems.Count > 0;
+        EditRuleButton.Enabled = DeleteRuleButton.Enabled = isAnyItemSelected;
     }
 
     #endregion
@@ -184,15 +186,15 @@ public partial class MainForm : Form
 
     private void AddVariableButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _variables.GetNames();
+        var usedNames = _expertSystemShell.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, _domains);
+        using var variableForm = new VariableForm(usedNames, _expertSystemShell.Domains);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var newVariable = variableForm.Variable;
-            _variables.Add(newVariable);
+            _expertSystemShell.Variables.Add(newVariable);
             AddVariableToListView(newVariable);
         }
     }
@@ -214,9 +216,9 @@ public partial class MainForm : Form
     {
         var selectedItem = VariablesListView.SelectedItems[0];
         var variable = selectedItem.Tag as Variable;
-        var usedNames = _variables.GetNames();
+        var usedNames = _expertSystemShell.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, variable!, _domains);
+        using var variableForm = new VariableForm(usedNames, variable!, _expertSystemShell.Domains);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -232,7 +234,7 @@ public partial class MainForm : Form
         var selectedItem = VariablesListView.SelectedItems[0];
         var variable = selectedItem.Tag as Variable;
 
-        _variables.Remove(variable!);
+        _expertSystemShell.Variables.Remove(variable!);
         VariablesListView.Items.Remove(selectedItem);
     }
 
@@ -274,7 +276,7 @@ public partial class MainForm : Form
 
     private void AddDomainButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _domains.GetNames();
+        var usedNames = _expertSystemShell.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames);
         var result = domainForm.ShowDialog();
@@ -282,7 +284,7 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var newDomain = domainForm.Domain;
-            _domains.Add(newDomain);
+            _expertSystemShell.Domains.Add(newDomain);
             AddDomainToListView(newDomain);
         }
     }
@@ -291,7 +293,7 @@ public partial class MainForm : Form
     {
         var selectedItem = DomainsListView.SelectedItems[0];
         var domain = selectedItem.Tag as Domain;
-        var usedNames = _domains.GetNames();
+        var usedNames = _expertSystemShell.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames, domain!);
         var result = domainForm.ShowDialog();
@@ -309,7 +311,7 @@ public partial class MainForm : Form
         var selectedItem = DomainsListView.SelectedItems[0];
         var domain = selectedItem.Tag as Domain;
 
-        _domains.Remove(domain!);
+        _expertSystemShell.Domains.Remove(domain!);
         DomainsListView.Items.Remove(selectedItem);
     }
 

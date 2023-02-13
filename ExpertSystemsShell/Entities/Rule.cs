@@ -22,7 +22,6 @@ public class Rule
 
     public Rule(string name, string reason, List<Fact> condtionPart, List<Fact> actionPart) : this(name, condtionPart, actionPart) => Reason = reason;
 
-    public Rule() { }
 
     public override string ToString()
     {
@@ -39,8 +38,17 @@ public class Rule
         }
 
         stringBuilder.Append("\r\n");
-        stringBuilder.Append("ТО ");
-        stringBuilder.Append(ActionPart.ToString());
+        stringBuilder.Append(" ТО ");
+
+        for (var i = 0; i < ActionPart.Count; i++)
+        {
+            stringBuilder.Append(ActionPart[i].ToString());
+
+            if (i < ActionPart.Count - 1)
+            {
+                stringBuilder.Append(" И ");
+            }
+        }
 
         return stringBuilder.ToString();
     }

@@ -114,6 +114,7 @@ namespace ExpertSystemsShell
             this.MenuFileNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.MenuFileNew.Size = new System.Drawing.Size(343, 44);
             this.MenuFileNew.Text = "Новый...";
+            this.MenuFileNew.Click += new System.EventHandler(this.MenuFileNew_Click);
             // 
             // MenuFileOpen
             // 
@@ -129,12 +130,14 @@ namespace ExpertSystemsShell
             this.MenuFileSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.MenuFileSave.Size = new System.Drawing.Size(343, 44);
             this.MenuFileSave.Text = "Сохранить";
+            this.MenuFileSave.Click += new System.EventHandler(this.MenuFileSave_Click);
             // 
             // MenuFileSaveAs
             // 
             this.MenuFileSaveAs.Name = "MenuFileSaveAs";
             this.MenuFileSaveAs.Size = new System.Drawing.Size(343, 44);
             this.MenuFileSaveAs.Text = "Сохранить как...";
+            this.MenuFileSaveAs.Click += new System.EventHandler(this.MenuFileSaveAs_Click);
             // 
             // MenuFileExit
             // 
@@ -159,12 +162,14 @@ namespace ExpertSystemsShell
             this.MenuConsultationStart.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.MenuConsultationStart.Size = new System.Drawing.Size(428, 44);
             this.MenuConsultationStart.Text = "Начать консультацию";
+            this.MenuConsultationStart.Click += new System.EventHandler(this.MenuConsultationStart_Click);
             // 
             // MenuConsultationExplain
             // 
             this.MenuConsultationExplain.Name = "MenuConsultationExplain";
             this.MenuConsultationExplain.Size = new System.Drawing.Size(428, 44);
             this.MenuConsultationExplain.Text = "Показать объяснение";
+            this.MenuConsultationExplain.Click += new System.EventHandler(this.MenuConsultationExplain_Click);
             // 
             // TabControl
             // 
@@ -218,8 +223,6 @@ namespace ExpertSystemsShell
             // 
             this.ActionPartListBox.FormattingEnabled = true;
             this.ActionPartListBox.ItemHeight = 32;
-            this.ActionPartListBox.Items.AddRange(new object[] {
-            "Листбокс, в котором будет посылка"});
             this.ActionPartListBox.Location = new System.Drawing.Point(3, 38);
             this.ActionPartListBox.Name = "ActionPartListBox";
             this.ActionPartListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
@@ -240,8 +243,6 @@ namespace ExpertSystemsShell
             // 
             this.ConditionPartListBox.FormattingEnabled = true;
             this.ConditionPartListBox.ItemHeight = 32;
-            this.ConditionPartListBox.Items.AddRange(new object[] {
-            "Листбокс, в котором будет посылка"});
             this.ConditionPartListBox.Location = new System.Drawing.Point(6, 32);
             this.ConditionPartListBox.Name = "ConditionPartListBox";
             this.ConditionPartListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;

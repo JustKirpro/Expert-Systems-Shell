@@ -6,7 +6,7 @@ namespace ExpertSystemsShell.Forms
 {
     public partial class RuleForm : Form
     {
-        public Rule Rule { get; private set; }
+        public Rule Rule { get; private set; } = null!;
 
         private Variables _variables;
 
@@ -15,7 +15,6 @@ namespace ExpertSystemsShell.Forms
         public RuleForm(Variables variables, Domains domains)
         {
             InitializeComponent();
-            Rule = new Rule();
             Text = "Создание нового правила";
             _variables= variables;
             _domains = domains;
