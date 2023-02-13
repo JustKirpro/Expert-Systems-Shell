@@ -38,7 +38,7 @@ namespace ExpertSystemsShell.Forms
             this.CondtionPartEditButton = new System.Windows.Forms.Button();
             this.CondtionPartAddButton = new System.Windows.Forms.Button();
             this.ExplanationGroupBox = new System.Windows.Forms.GroupBox();
-            this.ExplanationTextBox = new System.Windows.Forms.TextBox();
+            this.ReasonTextBox = new System.Windows.Forms.TextBox();
             this.OkButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
             this.ActionPartGroupBox = new System.Windows.Forms.GroupBox();
@@ -68,6 +68,7 @@ namespace ExpertSystemsShell.Forms
             this.RuleNameTextBox.Name = "RuleNameTextBox";
             this.RuleNameTextBox.Size = new System.Drawing.Size(886, 39);
             this.RuleNameTextBox.TabIndex = 0;
+            this.RuleNameTextBox.TextChanged += new System.EventHandler(this.RuleNameTextBox_TextChanged);
             // 
             // ConditionPartGroupBox
             // 
@@ -89,6 +90,7 @@ namespace ExpertSystemsShell.Forms
             this.ConditionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ConditionPartListView.TabIndex = 6;
             this.ConditionPartListView.UseCompatibleStateImageBehavior = false;
+            this.ConditionPartListView.SelectedIndexChanged += new System.EventHandler(this.ConditionPartListView_SelectedIndexChanged);
             // 
             // CondtionPartDeleteButton
             // 
@@ -99,6 +101,7 @@ namespace ExpertSystemsShell.Forms
             this.CondtionPartDeleteButton.TabIndex = 5;
             this.CondtionPartDeleteButton.Text = "Удалить";
             this.CondtionPartDeleteButton.UseVisualStyleBackColor = true;
+            this.CondtionPartDeleteButton.Click += new System.EventHandler(this.CondtionPartDeleteButton_Click);
             // 
             // CondtionPartEditButton
             // 
@@ -123,7 +126,7 @@ namespace ExpertSystemsShell.Forms
             // 
             // ExplanationGroupBox
             // 
-            this.ExplanationGroupBox.Controls.Add(this.ExplanationTextBox);
+            this.ExplanationGroupBox.Controls.Add(this.ReasonTextBox);
             this.ExplanationGroupBox.Location = new System.Drawing.Point(12, 442);
             this.ExplanationGroupBox.Name = "ExplanationGroupBox";
             this.ExplanationGroupBox.Size = new System.Drawing.Size(898, 118);
@@ -131,13 +134,14 @@ namespace ExpertSystemsShell.Forms
             this.ExplanationGroupBox.TabStop = false;
             this.ExplanationGroupBox.Text = "Пояснение";
             // 
-            // ExplanationTextBox
+            // ReasonTextBox
             // 
-            this.ExplanationTextBox.Location = new System.Drawing.Point(6, 38);
-            this.ExplanationTextBox.Multiline = true;
-            this.ExplanationTextBox.Name = "ExplanationTextBox";
-            this.ExplanationTextBox.Size = new System.Drawing.Size(886, 74);
-            this.ExplanationTextBox.TabIndex = 0;
+            this.ReasonTextBox.Location = new System.Drawing.Point(6, 38);
+            this.ReasonTextBox.Multiline = true;
+            this.ReasonTextBox.Name = "ReasonTextBox";
+            this.ReasonTextBox.Size = new System.Drawing.Size(886, 74);
+            this.ReasonTextBox.TabIndex = 0;
+            this.ReasonTextBox.TextChanged += new System.EventHandler(this.ReasonTextBox_TextChanged);
             // 
             // OkButton
             // 
@@ -151,13 +155,13 @@ namespace ExpertSystemsShell.Forms
             // 
             // CancelButton
             // 
+            this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.CancelButton.Location = new System.Drawing.Point(760, 566);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(150, 46);
             this.CancelButton.TabIndex = 5;
             this.CancelButton.Text = "Отмена";
             this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // ActionPartGroupBox
             // 
@@ -179,6 +183,7 @@ namespace ExpertSystemsShell.Forms
             this.ActionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ActionPartListView.TabIndex = 7;
             this.ActionPartListView.UseCompatibleStateImageBehavior = false;
+            this.ActionPartListView.SelectedIndexChanged += new System.EventHandler(this.ActionPartListView_SelectedIndexChanged);
             // 
             // ActionPartDeleteButton
             // 
@@ -189,6 +194,7 @@ namespace ExpertSystemsShell.Forms
             this.ActionPartDeleteButton.TabIndex = 8;
             this.ActionPartDeleteButton.Text = "Удалить";
             this.ActionPartDeleteButton.UseVisualStyleBackColor = true;
+            this.ActionPartDeleteButton.Click += new System.EventHandler(this.ActionPartDeleteButton_Click);
             // 
             // ActionPartEditButton
             // 
@@ -199,6 +205,7 @@ namespace ExpertSystemsShell.Forms
             this.ActionPartEditButton.TabIndex = 7;
             this.ActionPartEditButton.Text = "Изменить";
             this.ActionPartEditButton.UseVisualStyleBackColor = true;
+            this.ActionPartEditButton.Click += new System.EventHandler(this.ActionPartEditButton_Click);
             // 
             // ActionPartAddButton
             // 
@@ -208,6 +215,7 @@ namespace ExpertSystemsShell.Forms
             this.ActionPartAddButton.TabIndex = 6;
             this.ActionPartAddButton.Text = "Добавить";
             this.ActionPartAddButton.UseVisualStyleBackColor = true;
+            this.ActionPartAddButton.Click += new System.EventHandler(this.ActionPartAddButton_Click);
             // 
             // RuleForm
             // 
@@ -241,7 +249,7 @@ namespace ExpertSystemsShell.Forms
         private TextBox RuleNameTextBox;
         private GroupBox ConditionPartGroupBox;
         private GroupBox ExplanationGroupBox;
-        private TextBox ExplanationTextBox;
+        private TextBox ReasonTextBox;
         private Button OkButton;
         private new Button CancelButton;
         private GroupBox ActionPartGroupBox;

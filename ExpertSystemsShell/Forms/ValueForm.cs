@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpertSystemsShell.Entities;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -6,14 +7,14 @@ namespace ExpertSystemsShell.Forms;
 
 public partial class ValueForm : Form
 {
-    private readonly List<string> _usedValues;
+    private readonly List<DomainValue> _usedValues;
 
-    public string Value { get; private set; }
+    public DomainValue Value { get; private set; }
 
-    public ValueForm(List<string> usedValues, string value)
+    public ValueForm(List<DomainValue> usedValues, DomainValue value)
     {
         InitializeComponent();
-        ValueTextBox.Text = value;
+        ValueTextBox.Text = value.Value;
 
         _usedValues = usedValues;
         Value = value;
@@ -36,12 +37,12 @@ public partial class ValueForm : Form
     private void ValueTextBox_TextChanged(object sender, EventArgs e)
     {
         var value = GetValue();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(value);
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(value.Value);
     }
 
-    private string GetValue() => ValueTextBox.Text.Trim();
+    private DomainValue GetValue() => new(ValueTextBox.Text.Trim());
 
-    private bool IsValueUsed(string value) => _usedValues.Contains(value) && value != Value;
+    private bool IsValueUsed(DomainValue value) => _usedValues.Contains(value) && value != Value;
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

@@ -10,7 +10,7 @@ public partial class DomainForm : Form
 {
     private readonly List<string> _usedNames;
 
-    private readonly List<string> _values = new();
+    private readonly List<DomainValue> _values = new();
 
     public Domain Domain { get; private set; } = null!;
 

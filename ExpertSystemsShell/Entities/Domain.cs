@@ -7,7 +7,7 @@ public class Domain
 {
     public string Name { get; set; } = string.Empty;
 
-    public List<string> Values { get; set; } = new List<string>();
+    public List<DomainValue> Values { get; set; } = new List<DomainValue>();
 
     public string FormattedValues
     {
@@ -25,7 +25,7 @@ public class Domain
         }
     }
 
-    public Domain(string name, List<string> values)
+    public Domain(string name, List<DomainValue> values)
     {
         Name = name;
         Values = values;
