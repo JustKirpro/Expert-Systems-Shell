@@ -8,7 +8,7 @@ namespace ExpertSystemsShell.Forms;
 
 public partial class MainForm : Form
 {
-    private readonly ExpertSystemShell _expertSysteShell = new();
+    private readonly ExpertSystemShell _expertSystemShell = new();
 
     public MainForm()
     {
@@ -64,7 +64,7 @@ public partial class MainForm : Form
 
     private void AddRuleButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
 
         using var ruleForm = new RuleForm(knowledgeBase);
         var result = ruleForm.ShowDialog();
@@ -76,11 +76,11 @@ public partial class MainForm : Form
 
             if (selectedIndex > - 1)
             {
-                knowledgeBase.Rules.Insert(selectedIndex, rule);
+                knowledgeBase.InsertRule(selectedIndex, rule);
             }
             else
             {
-                knowledgeBase.Rules.Add(rule);
+                knowledgeBase.AddRule(rule);
             }
 
             AddRuleToListView(rule, selectedIndex);
@@ -92,11 +92,11 @@ public partial class MainForm : Form
 
     private void EditRuleButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(RulesListView);
-        var rule = selectedItem.Tag as Rule;
+        var rule = (Rule)selectedItem.Tag;
 
-        using var ruleForm = new RuleForm(knowledgeBase, rule!);
+        using var ruleForm = new RuleForm(knowledgeBase, rule);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -112,11 +112,11 @@ public partial class MainForm : Form
 
     private void DeleteRuleButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(RulesListView);
-        var rule = selectedItem.Tag as Rule;
+        var rule = (Rule)selectedItem.Tag;
 
-        knowledgeBase.Rules.Remove(rule!);
+        knowledgeBase.RemoveRule(rule);
         RulesListView.Items.Remove(selectedItem);
     }
 
@@ -155,11 +155,11 @@ public partial class MainForm : Form
     private void UpdateRulesListBoxes()
     {
         var selectedItem = GetSelectedItem(RulesListView);
-        var rule = selectedItem.Tag as Rule;
+        var rule = (Rule)selectedItem.Tag;
 
         ConditionPartListBox.Items.Clear();
 
-        foreach (var fact in rule!.ConditionPart)
+        foreach (var fact in rule.ConditionPart)
         {
             ConditionPartListBox.Items.Add(fact.FormattedFact);
         }
@@ -195,12 +195,12 @@ public partial class MainForm : Form
             return;
         }
 
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         item = RulesListView.Items[startIndex];
-        var rule = item.Tag as Rule;
+        var rule = (Rule)item.Tag;
 
         knowledgeBase.Rules.RemoveAt(startIndex);
-        knowledgeBase.Rules.Insert(endIndex, rule!);
+        knowledgeBase.Rules.Insert(endIndex, rule);
 
         RulesListView.Items.RemoveAt(startIndex);
         RulesListView.Items.Insert(endIndex, item);
@@ -212,16 +212,15 @@ public partial class MainForm : Form
 
     private void AddVariableButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
-        var usedNames = knowledgeBase.Variables.GetNames();
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
 
-        using var variableForm = new VariableForm(usedNames, knowledgeBase.Domains);
+        using var variableForm = new VariableForm(knowledgeBase);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var variable = variableForm.Variable!;
-            knowledgeBase.Variables.Add(variable);
+            knowledgeBase.AddVariable(variable);
             
             AddVariableToListView(variable);
         }
@@ -231,19 +230,17 @@ public partial class MainForm : Form
 
     private void EditVariableButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(VariablesListView);
-        var variable = selectedItem.Tag as Variable;
+        var variable = (Variable)selectedItem.Tag;
 
-        if (knowledgeBase.IsVariableUsed(variable!))
+        if (knowledgeBase.IsVariableUsed(variable))
         {
             ShowErrorMessageBox("Данная переменная используется, поэтому её нельзя изменить");
             return;
         }
 
-        var usedNames = knowledgeBase.Variables.GetNames();
-
-        using var variableForm = new VariableForm(usedNames, knowledgeBase.Domains, variable!);
+        using var variableForm = new VariableForm(knowledgeBase, variable);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -258,17 +255,17 @@ public partial class MainForm : Form
 
     private void DeleteVariableButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(VariablesListView);
-        var variable = selectedItem.Tag as Variable;
+        var variable = (Variable)selectedItem.Tag;
 
-        if (knowledgeBase.IsVariableUsed(variable!))
+        if (knowledgeBase.IsVariableUsed(variable))
         {
             ShowErrorMessageBox("Данная переменная используется, поэтому её нельзя удалить");
             return;
         }
 
-        knowledgeBase.Variables.Remove(variable!);
+        knowledgeBase.RemoveVariable(variable);
         VariablesListView.Items.Remove(selectedItem);
     }
 
@@ -309,11 +306,11 @@ public partial class MainForm : Form
     private void UpdateVariableListBoxes()
     {
         var selectedItem = GetSelectedItem(VariablesListView);
-        var variable = selectedItem.Tag as Variable;
+        var variable = (Variable)selectedItem.Tag;
 
         DomainValuesListBox.Items.Clear();
 
-        foreach (var value in variable!.Domain.Values)
+        foreach (var value in variable.Domain.Values)
         {
             DomainValuesListBox.Items.Add(value.Value);
         }
@@ -328,16 +325,15 @@ public partial class MainForm : Form
 
     private void AddDomainButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
-        var usedNames = knowledgeBase.Domains.GetNames();
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
 
-        using var domainForm = new DomainForm(usedNames);
+        using var domainForm = new DomainForm(knowledgeBase);
         var result = domainForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var domain = domainForm.Domain!;
-            knowledgeBase.Domains.Add(domain);
+            knowledgeBase.AddDomain(domain);
             
             AddDomainToListView(domain);
         }
@@ -345,12 +341,11 @@ public partial class MainForm : Form
 
     private void EditDomainButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(DomainsListView);
-        var domain = selectedItem.Tag as Domain;
-        var usedNames = knowledgeBase.Domains.GetNames();
+        var domain = (Domain)selectedItem.Tag;
 
-        using var domainForm = new DomainForm(usedNames, domain!);
+        using var domainForm = new DomainForm(knowledgeBase, domain);
         var result = domainForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -363,17 +358,17 @@ public partial class MainForm : Form
 
     private void DeleteDomainButton_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(DomainsListView);
-        var domain = selectedItem.Tag as Domain;
+        var domain = (Domain)selectedItem.Tag;
 
-        if (knowledgeBase.IsDomainUsed(domain!))
+        if (knowledgeBase.IsDomainUsed(domain))
         {
             ShowErrorMessageBox("Данный домен используется, поэтому его нельзя удалить");
             return;
         }
 
-        knowledgeBase.Domains.Remove(domain!);
+        knowledgeBase.RemoveDomain(domain);
         DomainsListView.Items.Remove(selectedItem);
     }
 
@@ -411,11 +406,11 @@ public partial class MainForm : Form
     private void UpdateDomainValuesListBox()
     {
         var selectedItem = GetSelectedItem(DomainsListView);
-        var domain = selectedItem.Tag as Domain;
+        var domain = (Domain)selectedItem.Tag;
 
         ValuesListBox.Items.Clear();
 
-        foreach (var value in domain!.Values)
+        foreach (var value in domain.Values)
         {
             ValuesListBox.Items.Add(value.Value);
         }
@@ -438,9 +433,9 @@ public partial class MainForm : Form
 
     private void PopulateLists()
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
 
-        var yesDomainValue = new DomainValue("Да", true);
+        var yesDomainValue = new DomainValue("Да");
         var noDomainValue = new DomainValue("Нет");
 
         var yesNoDomain = new Domain("Да / Нет", new List<DomainValue>() { yesDomainValue, noDomainValue });
@@ -483,7 +478,7 @@ public partial class MainForm : Form
 
     private void DisplayRules()
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         RulesListView.Items.Clear();
 
         foreach (var rule in knowledgeBase.Rules)
@@ -494,7 +489,7 @@ public partial class MainForm : Form
 
     private void DisplayVariables()
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         VariablesListView.Items.Clear();
 
         foreach (var variable in knowledgeBase.Variables)
@@ -505,7 +500,7 @@ public partial class MainForm : Form
 
     private void DisplayDomains()
     {
-        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
         DomainsListView.Items.Clear();
 
         foreach (var domain in knowledgeBase.Domains)

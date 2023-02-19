@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Entities.Collections;
+using ExpertSystemsShell.Modules;
 
 namespace ExpertSystemsShell.Forms;
 
 public partial class FactForm : Form
 {
+    private readonly KnowledgeBase _knowledgeBase;
+
     private readonly List<string> _usedVariables;
-
-    private readonly Variables _variables;
-
-    private readonly Domains _domains;
 
     private readonly bool _isRequested;
 
@@ -21,28 +19,26 @@ public partial class FactForm : Form
 
     public Fact? Fact { get; private set; }
 
-    public FactForm(List<string> usedVariables, Variables variables, Domains domains, bool isRequested)
+    public FactForm(KnowledgeBase knowledgeBase, List<string> usedVariables, bool isRequested)
     {
         InitializeComponent();
         Text = "Создание факта";
         OkButton.Enabled = false;
 
+        _knowledgeBase = knowledgeBase;
         _usedVariables = usedVariables;
-        _variables = variables;
-        _domains = domains;
         _isRequested = isRequested;
 
         InitializeVariableComboBox();
     }
 
-    public FactForm(List<string> usedVariables, Variables variables, Domains domains, Fact fact, bool isRequested)
+    public FactForm(KnowledgeBase knowledgeBase, List<string> usedVariables, Fact fact, bool isRequested)
     {
         InitializeComponent();
         Text = "Редактирование факта";
 
+        _knowledgeBase = knowledgeBase;
         _usedVariables = usedVariables;
-        _variables = variables;
-        _domains = domains;
         _isRequested = isRequested;
         Fact = fact;
 
@@ -55,7 +51,7 @@ public partial class FactForm : Form
 
         if (IsVariableUsed(variable))
         {
-            ShowErrorMessageBox($"В правиле уже содержится факт с переменной \'{variable.Name}\"");
+            ShowErrorMessageBox($"В правиле уже содержится факт с переменной \"{variable.Name}\"");
             return;
         }
 
@@ -67,16 +63,14 @@ public partial class FactForm : Form
 
     private void VariableAddButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _variables.GetNames();
-
-        using var variableForm = new VariableForm(usedNames, _domains);
+        using var variableForm = new VariableForm(_knowledgeBase);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var variable = variableForm.Variable!;
 
-            _variables.Add(variable);
+            _knowledgeBase.AddVariable(variable);
 
             if (IsVariableAvailable(variable)) 
             {
@@ -116,7 +110,7 @@ public partial class FactForm : Form
     private Variable GetVariable()
     {
         var name = VariableComboBox.Text;
-        return _variables.GetByName(name)!;
+        return _knowledgeBase.GetVariableByName(name);
     }
 
     private bool IsVariableUsed(Variable variable) => _usedVariables.Contains(variable.Name) && variable != Fact?.Variable;
@@ -146,16 +140,15 @@ public partial class FactForm : Form
 
     private void InitializeVariableComboBox()
     {
-        foreach (var variable in _variables)
-        {
-            if (IsVariableAvailable(variable))
-            {
-                VariableComboBox.Items.Add(variable.Name);
+        var variables = _knowledgeBase.Variables;
 
-                if (variable == Fact?.Variable)
-                {
-                    VariableComboBox.SelectedItem = variable.Name;
-                }
+        foreach (var variable in variables.Where(IsVariableAvailable))
+        {
+            VariableComboBox.Items.Add(variable.Name);
+
+            if (variable == Fact?.Variable)
+            {
+                VariableComboBox.SelectedItem = variable.Name;
             }
         }
     }

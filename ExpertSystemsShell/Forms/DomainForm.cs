@@ -4,32 +4,33 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
+using ExpertSystemsShell.Modules;
 
 namespace ExpertSystemsShell.Forms;
 
 public partial class DomainForm : Form
 {
-    private readonly List<string> _usedNames;
+    private readonly KnowledgeBase _knowledgeBase;
 
     private readonly List<DomainValue> _values = new();
 
     public Domain? Domain { get; private set; }
 
-    public DomainForm(List<string> usedNames)
+    public DomainForm(KnowledgeBase knowledgeBase)
     {
         InitializeComponent();
         Text = "Создание домена";
         OkButton.Enabled = false;
 
-        _usedNames= usedNames;
+        _knowledgeBase = knowledgeBase;
     }
 
-    public DomainForm(List<string> usedNames, Domain domain)
+    public DomainForm(KnowledgeBase knowledgeBase, Domain domain)
     {
         InitializeComponent();
         Text = "Редактирование домена";
 
-        _usedNames = usedNames;
+        _knowledgeBase = knowledgeBase;
         _values = domain.Values;
         Domain = domain;
 
@@ -64,18 +65,18 @@ public partial class DomainForm : Form
         _values.Add(domainValue);
 
         AddItemToListView(domainValue);
-        ValueTextBox.Text = string.Empty;
+        ResetValueTextBox();
         UpdateOkButtonAvailability();
     }
 
     private void EditButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem();
-        var domainValue = selectedItem.Tag as DomainValue;
+        var domainValue = (DomainValue)selectedItem.Tag;
 
-        if (domainValue!.IsUsed)
+        if (IsDomainValueUsed(domainValue))
         {
-            ShowErrorMessageBox($"Данное значение домена используется, поэтому его нельзя изменить");
+            ShowErrorMessageBox("Данное значение домена используется, поэтому его нельзя изменить");
             return;
         }
 
@@ -90,17 +91,17 @@ public partial class DomainForm : Form
         domainValue.Value = value;
         selectedItem.Text = value;
 
-        ValueTextBox.Text = string.Empty;
+        ResetValueTextBox();
     }
 
     private void DeleteButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem();
-        var domainValue = selectedItem.Tag as DomainValue;
+        var domainValue = (DomainValue)selectedItem.Tag;
 
-        if (domainValue!.IsUsed)
+        if (IsDomainValueUsed(domainValue))
         {
-            ShowErrorMessageBox($"Данное значение домена используется, поэтому его нельзя удалить");
+            ShowErrorMessageBox("Данное значение домена используется, поэтому его нельзя удалить");
             return;
         }
 
@@ -156,10 +157,10 @@ public partial class DomainForm : Form
         }
 
         item = ValuesListView.Items[startIndex];
-        var domainValue = item.Tag as DomainValue;
+        var domainValue = (DomainValue)item.Tag;
 
         _values.RemoveAt(startIndex);
-        _values.Insert(endIndex, domainValue!);
+        _values.Insert(endIndex, domainValue);
 
         ValuesListView.Items.RemoveAt(startIndex);
         ValuesListView.Items.Insert(endIndex, item);
@@ -181,13 +182,15 @@ public partial class DomainForm : Form
 
     private string GetName() => DomainNameTextBox.Text.Trim();
 
-    private bool IsNameUsed(string name) => _usedNames.Contains(name) && name != Domain?.Name;
+    private bool IsNameUsed(string name) => _knowledgeBase.IsDomainNameUsed(name) && name != Domain?.Name;
 
     private string GetValue() => ValueTextBox.Text.Trim();
 
     private bool IsValueAlreadyExists(string value) => _values.Any(v => v.Value == value);
 
     private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
+
+    private bool IsDomainValueUsed(DomainValue domainValue) => _knowledgeBase.IsDomainValueUsed(domainValue);
 
     private void InitializeComponents()
     {
@@ -217,6 +220,8 @@ public partial class DomainForm : Form
         var name = GetName();
         OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsAnyValueAdded();
     }
+
+    private void ResetValueTextBox() => ValueTextBox.Text = string.Empty;
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

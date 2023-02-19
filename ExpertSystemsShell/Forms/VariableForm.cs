@@ -1,40 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Entities.Collections;
+using ExpertSystemsShell.Modules;
 
 namespace ExpertSystemsShell.Forms;
+
 public partial class VariableForm : Form
 {
-    private readonly List<string> _usedNames;
-
-    private readonly Domains _domains;
+    private readonly KnowledgeBase _knowledgeBase;
 
     private string _questionText = string.Empty;
 
     public Variable? Variable { get; private set; }
 
-    public VariableForm(List<string> usedNames, Domains domains)
+    public VariableForm(KnowledgeBase knowledgeBase)
     {
         InitializeComponent();
         Text = "Создание переменной";
         OkButton.Enabled = false;
         RequestedOption.Checked = true;
 
-        _usedNames = usedNames;
-        _domains = domains;
+        _knowledgeBase = knowledgeBase;
 
         InitializeDomainsComboBox();
     }
 
-    public VariableForm(List<string> usedNames, Domains domains, Variable variable)
+    public VariableForm(KnowledgeBase knowledgeBase, Variable variable)
     {
         InitializeComponent();
         Text = "Редактирование переменной";
 
-        _usedNames = usedNames;
-        _domains = domains;
+        _knowledgeBase = knowledgeBase;
         Variable = variable;
 
         InitializeComponents();
@@ -67,15 +63,13 @@ public partial class VariableForm : Form
 
     private void AddDomainButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _domains.GetNames();
-
-        using var domainForm = new DomainForm(usedNames);
+        using var domainForm = new DomainForm(_knowledgeBase);
         var result = domainForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var domain = domainForm.Domain!;
-            _domains.Add(domain);
+            _knowledgeBase.AddDomain(domain);
 
             AddDomainToComboBox(domain);
         }
@@ -117,7 +111,7 @@ public partial class VariableForm : Form
 
     private string GetName() => VariableNameTextBox.Text.Trim();
 
-    private bool IsNameUsed(string name) => _usedNames.Contains(name) && name != Variable?.Name;
+    private bool IsNameUsed(string name) => _knowledgeBase.IsVariableNameUsed(name) && name != Variable?.Name;
 
     private string GetQuestion() => QuestionTextBox.Text.Trim();
 
@@ -149,7 +143,7 @@ public partial class VariableForm : Form
     private Domain GetDomain()
     {
         var name = DomainComboBox.SelectedItem.ToString()!;
-        return _domains.GetByName(name)!;
+        return _knowledgeBase.GetDomainByName(name);
     }
 
     private VariableType GetVariableType()
@@ -158,14 +152,8 @@ public partial class VariableForm : Form
         {
             return VariableType.Requested;
         }
-        else if (InferredOption.Checked)
-        {
-            return VariableType.Inferred;
-        }
-        else
-        {
-            return VariableType.RequestedInferred;
-        }
+        
+        return InferredOption.Checked ? VariableType.Inferred : VariableType.RequestedInferred;
     }
 
     private void InitializeComponents()
@@ -180,7 +168,9 @@ public partial class VariableForm : Form
 
     private void InitializeDomainsComboBox()
     {
-        foreach (var domain in _domains)
+        var domains = _knowledgeBase.Domains;
+
+        foreach (var domain in domains)
         {
             DomainComboBox.Items.Add(domain.Name);
 

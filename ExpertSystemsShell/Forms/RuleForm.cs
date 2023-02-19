@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -64,7 +65,7 @@ public partial class RuleForm : Form
     {
         var usedVariables = GetConditionPartUsedVariables();
 
-        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, true);
+        using var factForm = new FactForm(_knowledgeBase, usedVariables, true);
         var result = factForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -81,20 +82,20 @@ public partial class RuleForm : Form
     private void ConditionPartEditButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem(ConditionPartListView);
-        var fact = selectedItem.Tag as Fact;
+        var fact = (Fact)selectedItem.Tag;
 
         var usedVariables = GetConditionPartUsedVariables();
-        usedVariables.Remove(fact!.Variable.Name);
+        usedVariables.Remove(fact.Variable.Name);
 
-        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, fact, true);
+        using var factForm = new FactForm(_knowledgeBase, usedVariables, fact, true);
         var result = factForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var index = _conditionPart.IndexOf(fact);
-            fact = factForm.Fact;
+            fact = factForm.Fact!;
 
-            _conditionPart[index].Variable = fact!.Variable;
+            _conditionPart[index].Variable = fact.Variable;
             _conditionPart[index].Value = fact.Value;
 
             selectedItem.Text = fact.FormattedFact;
@@ -105,9 +106,9 @@ public partial class RuleForm : Form
     private void ConditionPartDeleteButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem(ConditionPartListView);
-        var fact = selectedItem.Tag as Fact;
+        var fact = (Fact)selectedItem.Tag;
 
-        _conditionPart.Remove(fact!);
+        _conditionPart.Remove(fact);
 
         ConditionPartListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
@@ -123,7 +124,7 @@ public partial class RuleForm : Form
     {
         var usedVariables = GetActionPartUsedVariables();
 
-        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, false);
+        using var factForm = new FactForm(_knowledgeBase, usedVariables, false);
         var result = factForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -140,12 +141,12 @@ public partial class RuleForm : Form
     private void ActionPartEditButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem(ActionPartListView);
-        var fact = selectedItem.Tag as Fact;
+        var fact = (Fact)selectedItem.Tag;
 
         var usedVariables = GetActionPartUsedVariables();
-        usedVariables.Remove(fact!.Variable.Name);
+        usedVariables.Remove(fact.Variable.Name);
 
-        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, fact, false);
+        using var factForm = new FactForm(_knowledgeBase, usedVariables, fact, false);
         var result = factForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -164,9 +165,9 @@ public partial class RuleForm : Form
     private void ActionPartDeleteButton_Click(object sender, EventArgs e)
     {
         var selectedItem = GetSelectedItem(ActionPartListView);
-        var fact = selectedItem.Tag as Fact;
+        var fact = (Fact)selectedItem.Tag;
 
-        _actionPart.Remove(fact!);
+        _actionPart.Remove(fact);
 
         ActionPartListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
@@ -194,17 +195,15 @@ public partial class RuleForm : Form
         Rule.ActionPart = actionPart;
     }
 
-    private void InitializeParts(List<Fact> conditionPart, List<Fact> actionPart)
+    private void InitializeParts(IEnumerable<Fact> conditionPart, IEnumerable<Fact> actionPart)
     {
-        foreach (var fact in conditionPart) 
+        foreach (var newFact in conditionPart.Select(fact => new Fact(fact.Variable, fact.Value)))
         {
-            var newFact = new Fact(fact.Variable, fact.Value);
             _conditionPart.Add(newFact);
         }
 
-        foreach (var fact in actionPart)
+        foreach (var newFact in actionPart.Select(fact => new Fact(fact.Variable, fact.Value)))
         {
-            var newFact = new Fact(fact.Variable, fact.Value);
             _actionPart.Add(newFact);
         }
     }
@@ -237,7 +236,7 @@ public partial class RuleForm : Form
         return true;
     }
 
-    private static bool IsFactsNumberMatched(Rule rule, List<Fact> conditionPart) => conditionPart.Count == rule.ConditionPart.Count;
+    private static bool IsFactsNumberMatched(Rule rule, ICollection conditionPart) => conditionPart.Count == rule.ConditionPart.Count;
 
     private List<string> GetConditionPartUsedVariables() => _conditionPart.Select(v => v.Variable.Name).ToList();
 
