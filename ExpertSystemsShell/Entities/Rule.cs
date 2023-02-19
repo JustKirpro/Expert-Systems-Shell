@@ -7,49 +7,49 @@ public class Rule
 {
     public string Name { get; set; }
 
-    public string? Reason { get; set; }
+    public string Reason { get; set; }
 
-    public List<Fact> CondtionPart { get; set; }
+    public List<Fact> ConditionPart { get; set; }
     
     public List<Fact> ActionPart { get; set; }
 
-    public Rule(string name, List<Fact> condtionPart, List<Fact> actionPart)
-    {
-        Name = name;
-        CondtionPart = condtionPart;
-        ActionPart = actionPart;
+    public string FormattedRule 
+    { 
+        get
+        {
+            var stringBuilder = new StringBuilder("ЕСЛИ ");
+
+            for (var i = 0; i < ConditionPart.Count; i++)
+            {
+                stringBuilder.Append(ConditionPart[i].FormattedFact);
+
+                if (i < ConditionPart.Count - 1)
+                {
+                    stringBuilder.Append(" И ");
+                }
+            }
+
+            stringBuilder.Append(" ТО ");
+
+            for (var i = 0; i < ActionPart.Count; i++)
+            {
+                stringBuilder.Append(ActionPart[i].FormattedFact);
+
+                if (i < ActionPart.Count - 1)
+                {
+                    stringBuilder.Append(" И ");
+                }
+            }
+
+            return stringBuilder.ToString();
+        } 
     }
 
-    public Rule(string name, string reason, List<Fact> condtionPart, List<Fact> actionPart) : this(name, condtionPart, actionPart) => Reason = reason;
-
-
-    public override string ToString()
+    public Rule(string name, string reason, List<Fact> conditionPart, List<Fact> actionPart)
     {
-        var stringBuilder = new StringBuilder("ЕСЛИ ");
-
-        for (var i = 0; i < CondtionPart.Count; i++)
-        {
-            stringBuilder.Append(CondtionPart[i].ToString());
-
-            if (i < CondtionPart.Count - 1)
-            {
-                stringBuilder.Append(" И ");
-            }
-        }
-
-        stringBuilder.Append("\r\n");
-        stringBuilder.Append(" ТО ");
-
-        for (var i = 0; i < ActionPart.Count; i++)
-        {
-            stringBuilder.Append(ActionPart[i].ToString());
-
-            if (i < ActionPart.Count - 1)
-            {
-                stringBuilder.Append(" И ");
-            }
-        }
-
-        return stringBuilder.ToString();
+        Name = name;
+        Reason = reason;
+        ConditionPart = conditionPart;
+        ActionPart = actionPart;
     }
 }

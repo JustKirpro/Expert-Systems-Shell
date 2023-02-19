@@ -5,9 +5,9 @@ namespace ExpertSystemsShell.Entities;
 
 public class Domain
 {
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
 
-    public List<DomainValue> Values { get; set; } = new List<DomainValue>();
+    public List<DomainValue> Values { get; set; }
 
     public string FormattedValues
     {
@@ -17,7 +17,7 @@ public class Domain
 
             foreach (var value in Values)
             {
-                stringBuilder.Append(value);
+                stringBuilder.Append(value.Value);
                 stringBuilder.Append(" / ");
             }
 

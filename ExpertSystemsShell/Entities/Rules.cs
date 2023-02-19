@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ExpertSystemsShell.Entities;
 
@@ -10,12 +9,12 @@ public class Rules :IEnumerable<Rule>
 
     public void Add(Rule rule) => _rules.Add(rule);
 
+    public void Insert(int index, Rule rule) => _rules.Insert(index, rule);
+
     public void Remove(Rule rule) => _rules.Remove(rule);
 
-    public List<string> GetNames() => _rules.Select(r => r.Name).ToList();
-
-    public Rule? GetByName(string name) => _rules.FirstOrDefault(r => r.Name == name);
-
+    public void RemoveAt(int index) => _rules.RemoveAt(index);
+    
     public IEnumerator<Rule> GetEnumerator() => (_rules as IEnumerable<Rule>).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

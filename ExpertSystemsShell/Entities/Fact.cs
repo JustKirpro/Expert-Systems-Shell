@@ -4,18 +4,13 @@ public class Fact
 {
     public Variable Variable { get; set; }
 
-    public string Value { get; set; }
+    public DomainValue Value { get; set; }
 
-    public Fact(Variable variable, string value)
+    public string FormattedFact => $"{Variable.Name} = {Value.Value}";
+
+    public Fact(Variable variable, DomainValue value)
     {
         Variable = variable;
         Value = value;
-    }
-
-    public Fact() { }
-
-    public override string ToString()
-    {
-        return $"{Variable.Name} = {Value}";
     }
 }
