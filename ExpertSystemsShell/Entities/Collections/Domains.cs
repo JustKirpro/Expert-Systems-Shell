@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ExpertSystemsShell.Entities;
+namespace ExpertSystemsShell.Entities.Collections;
 
 public class Domains : IEnumerable<Domain>
 {

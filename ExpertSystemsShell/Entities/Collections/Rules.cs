@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace ExpertSystemsShell.Entities;
+namespace ExpertSystemsShell.Entities.Collections;
 
-public class Rules :IEnumerable<Rule>
+public class Rules : IEnumerable<Rule>
 {
     private readonly List<Rule> _rules = new();
 
@@ -14,7 +14,7 @@ public class Rules :IEnumerable<Rule>
     public void Remove(Rule rule) => _rules.Remove(rule);
 
     public void RemoveAt(int index) => _rules.RemoveAt(index);
-    
+
     public IEnumerator<Rule> GetEnumerator() => (_rules as IEnumerable<Rule>).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

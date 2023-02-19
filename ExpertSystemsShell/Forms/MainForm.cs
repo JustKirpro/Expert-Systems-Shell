@@ -8,7 +8,7 @@ namespace ExpertSystemsShell.Forms;
 
 public partial class MainForm : Form
 {
-    private readonly KnowledgeBase _knowledgeBase = new();
+    private readonly ExpertSystemShell _expertSysteShell = new();
 
     public MainForm()
     {
@@ -64,7 +64,9 @@ public partial class MainForm : Form
 
     private void AddRuleButton_Click(object sender, EventArgs e)
     {
-        using var ruleForm = new RuleForm(_knowledgeBase);
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+
+        using var ruleForm = new RuleForm(knowledgeBase);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -74,11 +76,11 @@ public partial class MainForm : Form
 
             if (selectedIndex > - 1)
             {
-                _knowledgeBase.Rules.Insert(selectedIndex, rule);
+                knowledgeBase.Rules.Insert(selectedIndex, rule);
             }
             else
             {
-                _knowledgeBase.Rules.Add(rule);
+                knowledgeBase.Rules.Add(rule);
             }
 
             AddRuleToListView(rule, selectedIndex);
@@ -90,10 +92,11 @@ public partial class MainForm : Form
 
     private void EditRuleButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(RulesListView);
         var rule = selectedItem.Tag as Rule;
 
-        using var ruleForm = new RuleForm(_knowledgeBase, rule!);
+        using var ruleForm = new RuleForm(knowledgeBase, rule!);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -109,10 +112,11 @@ public partial class MainForm : Form
 
     private void DeleteRuleButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(RulesListView);
         var rule = selectedItem.Tag as Rule;
 
-        _knowledgeBase.Rules.Remove(rule!);
+        knowledgeBase.Rules.Remove(rule!);
         RulesListView.Items.Remove(selectedItem);
     }
 
@@ -191,11 +195,12 @@ public partial class MainForm : Form
             return;
         }
 
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         item = RulesListView.Items[startIndex];
         var rule = item.Tag as Rule;
 
-        _knowledgeBase.Rules.RemoveAt(startIndex);
-        _knowledgeBase.Rules.Insert(endIndex, rule!);
+        knowledgeBase.Rules.RemoveAt(startIndex);
+        knowledgeBase.Rules.Insert(endIndex, rule!);
 
         RulesListView.Items.RemoveAt(startIndex);
         RulesListView.Items.Insert(endIndex, item);
@@ -207,15 +212,16 @@ public partial class MainForm : Form
 
     private void AddVariableButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _knowledgeBase.Variables.GetNames();
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var usedNames = knowledgeBase.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, _knowledgeBase.Domains);
+        using var variableForm = new VariableForm(usedNames, knowledgeBase.Domains);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
             var variable = variableForm.Variable!;
-            _knowledgeBase.Variables.Add(variable);
+            knowledgeBase.Variables.Add(variable);
             
             AddVariableToListView(variable);
         }
@@ -225,18 +231,19 @@ public partial class MainForm : Form
 
     private void EditVariableButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(VariablesListView);
         var variable = selectedItem.Tag as Variable;
 
-        if (_knowledgeBase.IsVariableUsed(variable!))
+        if (knowledgeBase.IsVariableUsed(variable!))
         {
             ShowErrorMessageBox("Данная переменная используется, поэтому её нельзя изменить");
             return;
         }
 
-        var usedNames = _knowledgeBase.Variables.GetNames();
+        var usedNames = knowledgeBase.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, _knowledgeBase.Domains, variable!);
+        using var variableForm = new VariableForm(usedNames, knowledgeBase.Domains, variable!);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -251,16 +258,17 @@ public partial class MainForm : Form
 
     private void DeleteVariableButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(VariablesListView);
         var variable = selectedItem.Tag as Variable;
 
-        if (_knowledgeBase.IsVariableUsed(variable!))
+        if (knowledgeBase.IsVariableUsed(variable!))
         {
             ShowErrorMessageBox("Данная переменная используется, поэтому её нельзя удалить");
             return;
         }
 
-        _knowledgeBase.Variables.Remove(variable!);
+        knowledgeBase.Variables.Remove(variable!);
         VariablesListView.Items.Remove(selectedItem);
     }
 
@@ -320,7 +328,8 @@ public partial class MainForm : Form
 
     private void AddDomainButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _knowledgeBase.Domains.GetNames();
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+        var usedNames = knowledgeBase.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames);
         var result = domainForm.ShowDialog();
@@ -328,7 +337,7 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var domain = domainForm.Domain!;
-            _knowledgeBase.Domains.Add(domain);
+            knowledgeBase.Domains.Add(domain);
             
             AddDomainToListView(domain);
         }
@@ -336,9 +345,10 @@ public partial class MainForm : Form
 
     private void EditDomainButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(DomainsListView);
         var domain = selectedItem.Tag as Domain;
-        var usedNames = _knowledgeBase.Domains.GetNames();
+        var usedNames = knowledgeBase.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames, domain!);
         var result = domainForm.ShowDialog();
@@ -353,16 +363,17 @@ public partial class MainForm : Form
 
     private void DeleteDomainButton_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         var selectedItem = GetSelectedItem(DomainsListView);
         var domain = selectedItem.Tag as Domain;
 
-        if (_knowledgeBase.IsDomainUsed(domain!))
+        if (knowledgeBase.IsDomainUsed(domain!))
         {
             ShowErrorMessageBox("Данный домен используется, поэтому его нельзя удалить");
             return;
         }
 
-        _knowledgeBase.Domains.Remove(domain!);
+        knowledgeBase.Domains.Remove(domain!);
         DomainsListView.Items.Remove(selectedItem);
     }
 
@@ -427,6 +438,8 @@ public partial class MainForm : Form
 
     private void PopulateLists()
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
+
         var yesDomainValue = new DomainValue("Да", true);
         var noDomainValue = new DomainValue("Нет");
 
@@ -438,22 +451,22 @@ public partial class MainForm : Form
 
         var highMediumLowDomain = new Domain("Высокий / Средний/ Низкий", new List<DomainValue>() { highDomainValue, mediumDomainValue, lowDomainValue });
 
-        _knowledgeBase.Domains.Add(yesNoDomain);
-        _knowledgeBase.Domains.Add(highMediumLowDomain);
+        knowledgeBase.Domains.Add(yesNoDomain);
+        knowledgeBase.Domains.Add(highMediumLowDomain);
 
         var smokingVariable = new Variable("Курение", string.Empty, yesNoDomain, VariableType.Inferred);
         var heightVariable = new Variable("Рост", "мяу", highMediumLowDomain, VariableType.Requested);
         var weightVariable = new Variable("Вес", string.Empty, highMediumLowDomain, VariableType.Requested);
 
-        _knowledgeBase.Variables.Add(smokingVariable);
-        _knowledgeBase.Variables.Add(heightVariable);
-        _knowledgeBase.Variables.Add(weightVariable);
+        knowledgeBase.Variables.Add(smokingVariable);
+        knowledgeBase.Variables.Add(heightVariable);
+        knowledgeBase.Variables.Add(weightVariable);
 
         var rule1 = new Rule("R1", "Meow", new List<Fact> { new(weightVariable, mediumDomainValue), new(heightVariable, highDomainValue) }, new List<Fact> { new(smokingVariable, noDomainValue) });
         var rule2 = new Rule("R2", "Woof", new List<Fact> { new(weightVariable, highDomainValue), new(heightVariable, highDomainValue) }, new List<Fact> { new(smokingVariable, yesDomainValue) });
 
-        _knowledgeBase.Rules.Add(rule1);
-        _knowledgeBase.Rules.Add(rule2);
+        knowledgeBase.Rules.Add(rule1);
+        knowledgeBase.Rules.Add(rule2);
     }
 
     private void InitializeListViews()
@@ -470,9 +483,10 @@ public partial class MainForm : Form
 
     private void DisplayRules()
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         RulesListView.Items.Clear();
 
-        foreach (var rule in _knowledgeBase.Rules)
+        foreach (var rule in knowledgeBase.Rules)
         {
             AddRuleToListView(rule);
         }
@@ -480,9 +494,10 @@ public partial class MainForm : Form
 
     private void DisplayVariables()
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         VariablesListView.Items.Clear();
 
-        foreach (var variable in _knowledgeBase.Variables)
+        foreach (var variable in knowledgeBase.Variables)
         {
             AddVariableToListView(variable);
         }
@@ -490,9 +505,10 @@ public partial class MainForm : Form
 
     private void DisplayDomains()
     {
+        var knowledgeBase = _expertSysteShell.KnowledgeBase;
         DomainsListView.Items.Clear();
 
-        foreach (var domain in _knowledgeBase.Domains)
+        foreach (var domain in knowledgeBase.Domains)
         {
             AddDomainToListView(domain);
         }

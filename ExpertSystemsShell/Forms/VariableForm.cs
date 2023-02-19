@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
+using ExpertSystemsShell.Entities.Collections;
 
 namespace ExpertSystemsShell.Forms;
 public partial class VariableForm : Form

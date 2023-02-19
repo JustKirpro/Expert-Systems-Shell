@@ -1,6 +1,9 @@
 ﻿using System.Linq;
+using ExpertSystemsShell.Entities;
+using ExpertSystemsShell.Entities.Collections;
+using ExpertSystemsShell.Entities.Containers;
 
-namespace ExpertSystemsShell.Entities;
+namespace ExpertSystemsShell.Modules;
 
 public class KnowledgeBase
 {
