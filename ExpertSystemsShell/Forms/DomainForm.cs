@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
 
@@ -12,7 +13,7 @@ public partial class DomainForm : Form
 
     private readonly List<DomainValue> _values = new();
 
-    public Domain Domain { get; private set; } = null!;
+    public Domain? Domain { get; private set; }
 
     public DomainForm(List<string> usedNames)
     {
@@ -20,7 +21,7 @@ public partial class DomainForm : Form
         Text = "Создание домена";
         OkButton.Enabled = false;
 
-        _usedNames = usedNames;
+        _usedNames= usedNames;
     }
 
     public DomainForm(List<string> usedNames, Domain domain)
@@ -41,7 +42,7 @@ public partial class DomainForm : Form
 
         if (IsNameUsed(name))
         {
-            ShowErrorMessageBox($"Домен с именем {name} уже существует");
+            ShowErrorMessageBox($"Домен с именем \"{name}\" уже существует");
             return;
         }
 
@@ -53,84 +54,82 @@ public partial class DomainForm : Form
     {
         var value = GetValue();
 
-        if (IsValueUsed(value))
+        if (IsValueAlreadyExists(value))
         {
-            ShowErrorMessageBox("Данное значение уже есть в домене");
+            ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
             return;
         }
 
-        _values.Add(value);
-        ValuesListView.Items.Add(value);
+        var domainValue = new DomainValue(value);
+        _values.Add(domainValue);
 
-        SetValuePlaceholder();
+        AddItemToListView(domainValue);
+        ValueTextBox.Text = string.Empty;
         UpdateOkButtonAvailability();
     }
 
     private void EditButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = ValuesListView.SelectedItems[0];
-        var currentValue = selectedItem.Text;
-        var usedValues = GetValues();
+        var selectedItem = GetSelectedItem();
+        var domainValue = selectedItem.Tag as DomainValue;
 
-        using var valueForm = new ValueForm(usedValues, currentValue);
-        var result = valueForm.ShowDialog();
-
-        if (result == DialogResult.OK)
+        if (domainValue!.IsUsed)
         {
-            var index = _values.IndexOf(currentValue);
-            var value = valueForm.Value;
-
-            _values.RemoveAt(index);
-            _values.Insert(index, value);
-            
-            selectedItem.Text = value;
-            UpdateOkButtonAvailability();
+            ShowErrorMessageBox($"Данное значение домена используется, поэтому его нельзя изменить");
+            return;
         }
+
+        var value = GetValue();
+
+        if (IsValueAlreadyExists(value) && domainValue.Value != value)
+        {
+            ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
+            return;
+        }
+
+        domainValue.Value = value;
+        selectedItem.Text = value;
+
+        ValueTextBox.Text = string.Empty;
     }
 
     private void DeleteButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = ValuesListView.SelectedItems[0];
-        var value = selectedItem.Text;
+        var selectedItem = GetSelectedItem();
+        var domainValue = selectedItem.Tag as DomainValue;
 
-        _values.Remove(value);
-        
-        ValuesListView.Items.Remove(selectedItem);
+        if (domainValue!.IsUsed)
+        {
+            ShowErrorMessageBox($"Данное значение домена используется, поэтому его нельзя удалить");
+            return;
+        }
+
+        _values.Remove(domainValue);
+
+        RemoveItemFromListView(selectedItem);
         UpdateOkButtonAvailability();
     }
 
     private void ValuesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var isAnyValueSelected = ValuesListView.SelectedItems.Count > 0;
-        EditButton.Enabled = DeleteButton.Enabled = isAnyValueSelected;
-    }
+        DeleteButton.Enabled = isAnyValueSelected;
 
-    private void ValueTextBox_Enter(object sender, EventArgs e)
-    {
         var value = GetValue();
-
-        if (value == "Введите значение:")
-        {
-            ResetValuePlaceholder();
-        }
-    }
-
-    private void ValueTextBox_Leave(object sender, EventArgs e)
-    {
-        var value = GetValue();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            SetValuePlaceholder();
-        }
+        var isValueValid = !string.IsNullOrWhiteSpace(value);
+        EditButton.Enabled = isAnyValueSelected && isValueValid;
     }
 
     private void ValueTextBox_TextChanged(object sender, EventArgs e)
     {
         var value = GetValue();
-        AddButton.Enabled = !string.IsNullOrWhiteSpace(value);
-    }
+        var isValueValid = !string.IsNullOrWhiteSpace(value);
+        AddButton.Enabled = isValueValid;
 
+        var isAnyValueSelected = ValuesListView.SelectedItems.Count > 0;
+        EditButton.Enabled = isValueValid && isAnyValueSelected;
+    }
+    
     private void DomainNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
     private void ValuesListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
@@ -139,28 +138,36 @@ public partial class DomainForm : Form
 
     private void ValuesListView_DragDrop(object sender, DragEventArgs e)
     {
-        var fromItemIndex = ValuesListView.SelectedIndices[0];
+        var startIndex = GetSelectedItemIndex();
 
         var point = ValuesListView.PointToClient(new Point(e.X, e.Y));
-        var toItemIndex = ValuesListView.GetItemAt(point.X, point.Y)!.Index;
+        var item = ValuesListView.GetItemAt(point.X, point.Y);
 
-        if (fromItemIndex == toItemIndex)
+        if (item is null)
         {
             return;
         }
 
-        var fromItem = ValuesListView.Items[fromItemIndex];
+        var endIndex = item.Index;
 
-        _values.RemoveAt(fromItemIndex);
-        _values.Insert(toItemIndex, fromItem.Text);
+        if (startIndex == endIndex)
+        {
+            return;
+        }
 
-        ValuesListView.Items.RemoveAt(fromItemIndex);
-        ValuesListView.Items.Insert(toItemIndex, fromItem);
+        item = ValuesListView.Items[startIndex];
+        var domainValue = item.Tag as DomainValue;
+
+        _values.RemoveAt(startIndex);
+        _values.Insert(endIndex, domainValue!);
+
+        ValuesListView.Items.RemoveAt(startIndex);
+        ValuesListView.Items.Insert(endIndex, item);
 
         UpdateOkButtonAvailability();
     }
 
-    private void SetDomain(string name, List<string> values)
+    private void SetDomain(string name, List<DomainValue> values)
     {
         if (Domain is null)
         {
@@ -174,44 +181,42 @@ public partial class DomainForm : Form
 
     private string GetName() => DomainNameTextBox.Text.Trim();
 
-    private bool IsNameUsed(string name) => _usedNames.Contains(name) && name != Domain.Name;
+    private bool IsNameUsed(string name) => _usedNames.Contains(name) && name != Domain?.Name;
 
     private string GetValue() => ValueTextBox.Text.Trim();
 
-    private List<string> GetValues()
-    {
-        var values = new List<string>();
+    private bool IsValueAlreadyExists(string value) => _values.Any(v => v.Value == value);
 
-        foreach (var listViewItem in ValuesListView.Items)
-        {
-            var value = (listViewItem as ListViewItem)!.Text;
-            values.Add(value);
-        }
-
-        return values;
-    }
-
-    private bool IsValueUsed(string value) => _values.Contains(value);
+    private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
 
     private void InitializeComponents()
     {
-        DomainNameTextBox.Text = Domain.Name;
+        DomainNameTextBox.Text = Domain!.Name;
 
         foreach (var value in Domain.Values)
         {
-            ValuesListView.Items.Add(value);
+            var item = ValuesListView.Items.Add(value.Value);
+            item.Tag = value;
         }
     }
 
-    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    private ListViewItem GetSelectedItem() => ValuesListView.SelectedItems[0];
+
+    private int GetSelectedItemIndex() => ValuesListView.SelectedIndices[0];
+
+    private void AddItemToListView(DomainValue domainValue)
+    {
+        var item = ValuesListView.Items.Add(domainValue.Value);
+        item.Tag = domainValue;
+    }
+
+    private void RemoveItemFromListView(ListViewItem item) => ValuesListView.Items.Remove(item);
 
     private void UpdateOkButtonAvailability()
     {
         var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && ValuesListView.Items.Count > 0;
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsAnyValueAdded();
     }
 
-    private void SetValuePlaceholder() => ValueTextBox.Text = "Введите значение:";
-
-    private void ResetValuePlaceholder() => ValueTextBox.Text = string.Empty;
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

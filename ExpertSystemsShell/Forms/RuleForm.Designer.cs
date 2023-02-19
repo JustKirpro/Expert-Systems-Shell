@@ -34,9 +34,9 @@ namespace ExpertSystemsShell.Forms
             this.RuleNameTextBox = new System.Windows.Forms.TextBox();
             this.ConditionPartGroupBox = new System.Windows.Forms.GroupBox();
             this.ConditionPartListView = new System.Windows.Forms.ListView();
-            this.CondtionPartDeleteButton = new System.Windows.Forms.Button();
-            this.CondtionPartEditButton = new System.Windows.Forms.Button();
-            this.CondtionPartAddButton = new System.Windows.Forms.Button();
+            this.ConditionPartDeleteButton = new System.Windows.Forms.Button();
+            this.ConditionPartEditButton = new System.Windows.Forms.Button();
+            this.ConditionPartAddButton = new System.Windows.Forms.Button();
             this.ExplanationGroupBox = new System.Windows.Forms.GroupBox();
             this.ReasonTextBox = new System.Windows.Forms.TextBox();
             this.OkButton = new System.Windows.Forms.Button();
@@ -73,9 +73,9 @@ namespace ExpertSystemsShell.Forms
             // ConditionPartGroupBox
             // 
             this.ConditionPartGroupBox.Controls.Add(this.ConditionPartListView);
-            this.ConditionPartGroupBox.Controls.Add(this.CondtionPartDeleteButton);
-            this.ConditionPartGroupBox.Controls.Add(this.CondtionPartEditButton);
-            this.ConditionPartGroupBox.Controls.Add(this.CondtionPartAddButton);
+            this.ConditionPartGroupBox.Controls.Add(this.ConditionPartDeleteButton);
+            this.ConditionPartGroupBox.Controls.Add(this.ConditionPartEditButton);
+            this.ConditionPartGroupBox.Controls.Add(this.ConditionPartAddButton);
             this.ConditionPartGroupBox.Location = new System.Drawing.Point(12, 106);
             this.ConditionPartGroupBox.Name = "ConditionPartGroupBox";
             this.ConditionPartGroupBox.Size = new System.Drawing.Size(446, 330);
@@ -86,43 +86,45 @@ namespace ExpertSystemsShell.Forms
             // ConditionPartListView
             // 
             this.ConditionPartListView.Location = new System.Drawing.Point(6, 35);
+            this.ConditionPartListView.MultiSelect = false;
             this.ConditionPartListView.Name = "ConditionPartListView";
             this.ConditionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ConditionPartListView.TabIndex = 6;
             this.ConditionPartListView.UseCompatibleStateImageBehavior = false;
+            this.ConditionPartListView.View = System.Windows.Forms.View.List;
             this.ConditionPartListView.SelectedIndexChanged += new System.EventHandler(this.ConditionPartListView_SelectedIndexChanged);
             // 
-            // CondtionPartDeleteButton
+            // ConditionPartDeleteButton
             // 
-            this.CondtionPartDeleteButton.Enabled = false;
-            this.CondtionPartDeleteButton.Location = new System.Drawing.Point(302, 293);
-            this.CondtionPartDeleteButton.Name = "CondtionPartDeleteButton";
-            this.CondtionPartDeleteButton.Size = new System.Drawing.Size(138, 37);
-            this.CondtionPartDeleteButton.TabIndex = 5;
-            this.CondtionPartDeleteButton.Text = "Удалить";
-            this.CondtionPartDeleteButton.UseVisualStyleBackColor = true;
-            this.CondtionPartDeleteButton.Click += new System.EventHandler(this.CondtionPartDeleteButton_Click);
+            this.ConditionPartDeleteButton.Enabled = false;
+            this.ConditionPartDeleteButton.Location = new System.Drawing.Point(302, 293);
+            this.ConditionPartDeleteButton.Name = "ConditionPartDeleteButton";
+            this.ConditionPartDeleteButton.Size = new System.Drawing.Size(138, 37);
+            this.ConditionPartDeleteButton.TabIndex = 5;
+            this.ConditionPartDeleteButton.Text = "Удалить";
+            this.ConditionPartDeleteButton.UseVisualStyleBackColor = true;
+            this.ConditionPartDeleteButton.Click += new System.EventHandler(this.ConditionPartDeleteButton_Click);
             // 
-            // CondtionPartEditButton
+            // ConditionPartEditButton
             // 
-            this.CondtionPartEditButton.Enabled = false;
-            this.CondtionPartEditButton.Location = new System.Drawing.Point(151, 293);
-            this.CondtionPartEditButton.Name = "CondtionPartEditButton";
-            this.CondtionPartEditButton.Size = new System.Drawing.Size(145, 37);
-            this.CondtionPartEditButton.TabIndex = 4;
-            this.CondtionPartEditButton.Text = "Изменить";
-            this.CondtionPartEditButton.UseVisualStyleBackColor = true;
-            this.CondtionPartEditButton.Click += new System.EventHandler(this.CondtionPartEditButton_Click);
+            this.ConditionPartEditButton.Enabled = false;
+            this.ConditionPartEditButton.Location = new System.Drawing.Point(151, 293);
+            this.ConditionPartEditButton.Name = "ConditionPartEditButton";
+            this.ConditionPartEditButton.Size = new System.Drawing.Size(145, 37);
+            this.ConditionPartEditButton.TabIndex = 4;
+            this.ConditionPartEditButton.Text = "Изменить";
+            this.ConditionPartEditButton.UseVisualStyleBackColor = true;
+            this.ConditionPartEditButton.Click += new System.EventHandler(this.ConditionPartEditButton_Click);
             // 
-            // CondtionPartAddButton
+            // ConditionPartAddButton
             // 
-            this.CondtionPartAddButton.Location = new System.Drawing.Point(6, 293);
-            this.CondtionPartAddButton.Name = "CondtionPartAddButton";
-            this.CondtionPartAddButton.Size = new System.Drawing.Size(138, 37);
-            this.CondtionPartAddButton.TabIndex = 3;
-            this.CondtionPartAddButton.Text = "Добавить";
-            this.CondtionPartAddButton.UseVisualStyleBackColor = true;
-            this.CondtionPartAddButton.Click += new System.EventHandler(this.CondtionPartAddButton_Click);
+            this.ConditionPartAddButton.Location = new System.Drawing.Point(6, 293);
+            this.ConditionPartAddButton.Name = "ConditionPartAddButton";
+            this.ConditionPartAddButton.Size = new System.Drawing.Size(138, 37);
+            this.ConditionPartAddButton.TabIndex = 3;
+            this.ConditionPartAddButton.Text = "Добавить";
+            this.ConditionPartAddButton.UseVisualStyleBackColor = true;
+            this.ConditionPartAddButton.Click += new System.EventHandler(this.ConditionPartAddButton_Click);
             // 
             // ExplanationGroupBox
             // 
@@ -141,7 +143,6 @@ namespace ExpertSystemsShell.Forms
             this.ReasonTextBox.Name = "ReasonTextBox";
             this.ReasonTextBox.Size = new System.Drawing.Size(886, 74);
             this.ReasonTextBox.TabIndex = 0;
-            this.ReasonTextBox.TextChanged += new System.EventHandler(this.ReasonTextBox_TextChanged);
             // 
             // OkButton
             // 
@@ -179,10 +180,12 @@ namespace ExpertSystemsShell.Forms
             // ActionPartListView
             // 
             this.ActionPartListView.Location = new System.Drawing.Point(6, 35);
+            this.ActionPartListView.MultiSelect = false;
             this.ActionPartListView.Name = "ActionPartListView";
             this.ActionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ActionPartListView.TabIndex = 7;
             this.ActionPartListView.UseCompatibleStateImageBehavior = false;
+            this.ActionPartListView.View = System.Windows.Forms.View.List;
             this.ActionPartListView.SelectedIndexChanged += new System.EventHandler(this.ActionPartListView_SelectedIndexChanged);
             // 
             // ActionPartDeleteButton
@@ -253,9 +256,9 @@ namespace ExpertSystemsShell.Forms
         private Button OkButton;
         private new Button CancelButton;
         private GroupBox ActionPartGroupBox;
-        private Button CondtionPartAddButton;
-        private Button CondtionPartDeleteButton;
-        private Button CondtionPartEditButton;
+        private Button ConditionPartAddButton;
+        private Button ConditionPartDeleteButton;
+        private Button ConditionPartEditButton;
         private Button ActionPartDeleteButton;
         private Button ActionPartEditButton;
         private Button ActionPartAddButton;

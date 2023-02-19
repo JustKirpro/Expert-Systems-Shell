@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
 
@@ -6,33 +8,41 @@ namespace ExpertSystemsShell.Forms;
 
 public partial class FactForm : Form
 {
+    private readonly List<string> _usedVariables;
+
     private readonly Variables _variables;
 
     private readonly Domains _domains;
 
-    private Variable? _previousSelectedVariable;
+    private readonly bool _isRequested;
 
-    public Fact Fact { get; private set; } = null!;
+    private Variable _previousSelectedVariable = null!;
 
-    public FactForm(Variables variables, Domains domains)
+    public Fact? Fact { get; private set; }
+
+    public FactForm(List<string> usedVariables, Variables variables, Domains domains, bool isRequested)
     {
         InitializeComponent();
         Text = "Создание факта";
         OkButton.Enabled = false;
 
+        _usedVariables = usedVariables;
         _variables = variables;
         _domains = domains;
+        _isRequested = isRequested;
 
         InitializeVariableComboBox();
     }
 
-    public FactForm(Variables variables, Domains domains, Fact fact)
+    public FactForm(List<string> usedVariables, Variables variables, Domains domains, Fact fact, bool isRequested)
     {
         InitializeComponent();
         Text = "Редактирование факта";
 
+        _usedVariables = usedVariables;
         _variables = variables;
         _domains = domains;
+        _isRequested = isRequested;
         Fact = fact;
 
         InitializeComponents();
@@ -41,9 +51,16 @@ public partial class FactForm : Form
     private void OkButton_Click(object sender, EventArgs e)
     {
         var variable = _previousSelectedVariable;
-        var value = GetValue();
 
-        SetFact(variable!, value);
+        if (IsVariableUsed(variable))
+        {
+            ShowErrorMessageBox($"В правиле уже содержится факт с переменной \'{variable.Name}\"");
+            return;
+        }
+
+        var value = GetValue(variable);
+
+        SetFact(variable, value);
         DialogResult = DialogResult.OK;
     }
 
@@ -56,11 +73,14 @@ public partial class FactForm : Form
 
         if (result == DialogResult.OK)
         {
-            var variable = variableForm.Variable;
+            var variable = variableForm.Variable!;
 
             _variables.Add(variable);
 
-            AddVariableToComboBox(variable);
+            if (IsVariableAvailable(variable)) 
+            {
+                AddVariableToComboBox(variable);
+            }
         }
     }
 
@@ -80,7 +100,7 @@ public partial class FactForm : Form
 
     private void ValueComboBox_SelectedIndexChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
-    private void SetFact(Variable variable, string value)
+    private void SetFact(Variable variable, DomainValue value)
     {
         if (Fact is null)
         {
@@ -98,7 +118,24 @@ public partial class FactForm : Form
         return _variables.GetByName(name)!;
     }
 
-    private string GetValue() => ValueComboBox.Text;
+    private bool IsVariableUsed(Variable variable) => _usedVariables.Contains(variable.Name) && variable != Fact?.Variable;
+
+    private DomainValue GetValue(Variable variable)
+    {
+        var value = ValueComboBox.Text;
+        var domain = variable.Domain;
+
+        return domain.Values.First(v => v.Value == value);
+    }
+    
+    private bool IsVariableAvailable(Variable variable)
+    {
+        return (IsVariableRequestedInferred() || IsVariableRequested() && _isRequested || IsVariableInferred() && !_isRequested) && !IsVariableUsed(variable);
+        
+        bool IsVariableRequestedInferred() => variable.Type is VariableType.RequestedInferred;
+        bool IsVariableRequested() => variable.Type is VariableType.Requested;
+        bool IsVariableInferred() => variable.Type is VariableType.Inferred;
+    }
 
     private void InitializeComponents()
     {
@@ -110,26 +147,31 @@ public partial class FactForm : Form
     {
         foreach (var variable in _variables)
         {
-            VariableComboBox.Items.Add(variable.Name);
-
-            if (variable == Fact?.Variable)
+            if (IsVariableAvailable(variable))
             {
-                VariableComboBox.SelectedItem = variable.Name;
+                VariableComboBox.Items.Add(variable.Name);
+
+                if (variable == Fact?.Variable)
+                {
+                    VariableComboBox.SelectedItem = variable.Name;
+                }
             }
         }
     }
 
     private void InitializeValueComboBox()
     {
-        var values = Fact.Variable.Domain.Values;
+        var values = Fact!.Variable.Domain.Values;
+
+        ValueComboBox.Items.Clear();
 
         foreach (var value in values)
         {
-            ValueComboBox.Items.Add(value);
+            ValueComboBox.Items.Add(value.Value);
 
             if (value == Fact.Value)
             {
-                VariableComboBox.SelectedItem = value;
+                ValueComboBox.SelectedItem = value.Value;
             }
         }
     }
@@ -139,12 +181,18 @@ public partial class FactForm : Form
         ValueComboBox.Items.Clear();
         ValueComboBox.SelectedIndex = -1;
 
-        var values = variable!.Domain.Values;
+        var values = variable.Domain.Values;
 
         foreach (var value in values)
         {
-            ValueComboBox.Items.Add(value);
+            ValueComboBox.Items.Add(value.Value);
         }
+    }
+
+    private void AddVariableToComboBox(Variable variable)
+    {
+        VariableComboBox.Items.Add(variable.Name);
+        VariableComboBox.SelectedItem = variable.Name;
     }
 
     private void UpdateOkButtonAvailability() => OkButton.Enabled = IsAnyVariableSelected() && IsAnyValueSelected();
@@ -153,9 +201,5 @@ public partial class FactForm : Form
 
     private bool IsAnyValueSelected() => ValueComboBox.SelectedIndex > -1;
 
-    private void AddVariableToComboBox(Variable variable)
-    {
-        VariableComboBox.Items.Add(variable.Name);
-        VariableComboBox.SelectedItem = variable.Name;
-    }
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

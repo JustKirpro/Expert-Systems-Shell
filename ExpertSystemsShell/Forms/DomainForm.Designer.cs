@@ -72,9 +72,9 @@
             // 
             // OkButton
             // 
-            this.OkButton.Location = new System.Drawing.Point(441, 515);
+            this.OkButton.Location = new System.Drawing.Point(441, 516);
             this.OkButton.Name = "OkButton";
-            this.OkButton.Size = new System.Drawing.Size(150, 46);
+            this.OkButton.Size = new System.Drawing.Size(150, 45);
             this.OkButton.TabIndex = 8;
             this.OkButton.Text = "ОК";
             this.OkButton.UseVisualStyleBackColor = true;
@@ -133,10 +133,7 @@
             this.ValueTextBox.Name = "ValueTextBox";
             this.ValueTextBox.Size = new System.Drawing.Size(723, 39);
             this.ValueTextBox.TabIndex = 1;
-            this.ValueTextBox.Text = "Введите значение:";
             this.ValueTextBox.TextChanged += new System.EventHandler(this.ValueTextBox_TextChanged);
-            this.ValueTextBox.Enter += new System.EventHandler(this.ValueTextBox_Enter);
-            this.ValueTextBox.Leave += new System.EventHandler(this.ValueTextBox_Leave);
             // 
             // ValuesListView
             // 

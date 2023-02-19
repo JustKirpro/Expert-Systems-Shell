@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace ExpertSystemsShell
+namespace ExpertSystemsShell.Forms
 {
     partial class MainForm
     {
@@ -199,6 +199,7 @@ namespace ExpertSystemsShell
             // 
             // RulesListView
             // 
+            this.RulesListView.AllowDrop = true;
             this.RulesListView.FullRowSelect = true;
             this.RulesListView.Location = new System.Drawing.Point(0, 0);
             this.RulesListView.MultiSelect = false;
@@ -207,7 +208,10 @@ namespace ExpertSystemsShell
             this.RulesListView.TabIndex = 8;
             this.RulesListView.UseCompatibleStateImageBehavior = false;
             this.RulesListView.View = System.Windows.Forms.View.Details;
+            this.RulesListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.RulesListView_ItemDrag);
             this.RulesListView.SelectedIndexChanged += new System.EventHandler(this.RulesListView_SelectedIndexChanged);
+            this.RulesListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.RulesListView_DragDrop);
+            this.RulesListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.RulesListView_DragEnter);
             // 
             // ActionPartGroupBox
             // 
@@ -222,6 +226,7 @@ namespace ExpertSystemsShell
             // ActionPartListBox
             // 
             this.ActionPartListBox.FormattingEnabled = true;
+            this.ActionPartListBox.HorizontalScrollbar = true;
             this.ActionPartListBox.ItemHeight = 32;
             this.ActionPartListBox.Location = new System.Drawing.Point(3, 38);
             this.ActionPartListBox.Name = "ActionPartListBox";
@@ -242,6 +247,7 @@ namespace ExpertSystemsShell
             // ConditionPartListBox
             // 
             this.ConditionPartListBox.FormattingEnabled = true;
+            this.ConditionPartListBox.HorizontalScrollbar = true;
             this.ConditionPartListBox.ItemHeight = 32;
             this.ConditionPartListBox.Location = new System.Drawing.Point(6, 32);
             this.ConditionPartListBox.Name = "ConditionPartListBox";
@@ -271,6 +277,7 @@ namespace ExpertSystemsShell
             this.DeleteRuleButton.TabIndex = 2;
             this.DeleteRuleButton.Text = "Удалить";
             this.DeleteRuleButton.UseVisualStyleBackColor = false;
+            this.DeleteRuleButton.Click += new System.EventHandler(this.DeleteRuleButton_Click);
             // 
             // EditRuleButton
             // 
@@ -333,9 +340,11 @@ namespace ExpertSystemsShell
             // QuestionListBox
             // 
             this.QuestionListBox.FormattingEnabled = true;
+            this.QuestionListBox.HorizontalScrollbar = true;
             this.QuestionListBox.ItemHeight = 32;
             this.QuestionListBox.Location = new System.Drawing.Point(3, 38);
             this.QuestionListBox.Name = "QuestionListBox";
+            this.QuestionListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.QuestionListBox.Size = new System.Drawing.Size(578, 196);
             this.QuestionListBox.TabIndex = 1;
             // 
@@ -352,9 +361,11 @@ namespace ExpertSystemsShell
             // DomainValuesListBox
             // 
             this.DomainValuesListBox.FormattingEnabled = true;
+            this.DomainValuesListBox.HorizontalScrollbar = true;
             this.DomainValuesListBox.ItemHeight = 32;
             this.DomainValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.DomainValuesListBox.Name = "DomainValuesListBox";
+            this.DomainValuesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.DomainValuesListBox.Size = new System.Drawing.Size(575, 292);
             this.DomainValuesListBox.TabIndex = 0;
             // 
@@ -443,6 +454,7 @@ namespace ExpertSystemsShell
             // ValuesListBox
             // 
             this.ValuesListBox.FormattingEnabled = true;
+            this.ValuesListBox.HorizontalScrollbar = true;
             this.ValuesListBox.ItemHeight = 32;
             this.ValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.ValuesListBox.Name = "ValuesListBox";
@@ -510,7 +522,6 @@ namespace ExpertSystemsShell
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Новая экспертная система";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();
             this.TabControl.ResumeLayout(false);

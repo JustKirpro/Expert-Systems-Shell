@@ -1,104 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Forms;
 
-namespace ExpertSystemsShell;
+namespace ExpertSystemsShell.Forms;
 
 public partial class MainForm : Form
 {
-    private readonly ExpertSystemShell _expertSystemShell = new();
+    private readonly KnowledgeBase _knowledgeBase = new();
 
     public MainForm()
     {
         InitializeComponent();
         PopulateLists();
         InitializeListViews();
-    }
-
-    private void MainForm_Load(object sender, EventArgs e)
-    {
-        RulesListView.Columns.Add("»Ïˇ");
-        RulesListView.Columns.Add("ŒÔËÒ‡ÌËÂ");
-        RulesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        RulesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-
-        VariablesListView.Columns.Add("»Ïˇ");
-        VariablesListView.Columns.Add("“ËÔ");
-        VariablesListView.Columns.Add("ƒÓÏÂÌ");
-        VariablesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        VariablesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-
-        DomainsListView.Columns.Add("»Ïˇ");
-        DomainsListView.Columns.Add("«Ì‡˜ÂÌËˇ");
-        DomainsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        DomainsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-    }
-
-    private void PopulateLists()
-    {
-        var domain1 = new Domain("ƒ‡ / ÕÂÚ1", new List<string>() { "ƒ‡", "ÕÂÚ" });
-        var domain2 = new Domain("¬˚ÒÓÍËÈ / —Â‰ÌËÈ / ÕËÁÍËÈ1", new List<string>() { "¬˚ÒÓÍËÈ", "—Â‰ÌËÈ", "ÕËÁÍËÈ" });
-
-        _expertSystemShell.Domains.Add(domain1);
-        _expertSystemShell.Domains.Add(domain2);
-
-        var variable1 = new Variable(" ÛÂÌËÂ", domain1, VariableType.Inferred, null);
-        var variable2 = new Variable("–ÓÒÚ", domain2, VariableType.Requested, "ÃˇÛ");
-        var variable3 = new Variable("¬ÂÒ", domain2, VariableType.Requested);
-
-        _expertSystemShell.Variables.Add(variable1);
-        _expertSystemShell.Variables.Add(variable2);
-        _expertSystemShell.Variables.Add(variable3);
-
-        var rule1 = new Rule("R1", "Meow", new List<Fact> { new Fact { Variable = variable1, Value = "ƒ‡" }, new Fact { Variable = variable2, Value = "—Â‰ÌËÈ" } }, new List<Fact> { new Fact { Variable = variable3, Value = "—Â‰ÌËÈ" } });
-
-        var rule2 = new Rule("R2", "Woof", new List<Fact> { new Fact { Variable = variable1, Value = "ÕÂÚ" }, new Fact { Variable = variable2, Value = "—Â‰ÌËÈ" } }, new List<Fact> { new Fact { Variable = variable3, Value = "¬˚ÒÓÍËÈ" } });
-           
-        _expertSystemShell.Rules.Add(rule1);
-        _expertSystemShell.Rules.Add(rule2);
-    }
-
-    private void InitializeListViews()
-    {
-        foreach (var rule in _expertSystemShell.Rules)
-        {
-            var listViewItem = new ListViewItem(rule.Name)
-            {
-                Tag = rule
-            };
-
-            listViewItem.SubItems.Add(rule.ToString());
-
-            RulesListView.Items.Add(listViewItem);
-        }
-
-        foreach (var variable in _expertSystemShell.Variables)
-        {
-            var listViewItem = new ListViewItem(variable.Name)
-            {
-                Tag = variable
-            };
-
-            listViewItem.SubItems.Add(variable.FormattedType);
-            listViewItem.SubItems.Add(variable.Domain.Name);
-
-            VariablesListView.Items.Add(listViewItem);
-        }
-
-
-        foreach (var domain in _expertSystemShell.Domains)
-        {
-            var listViewItem = new ListViewItem(domain.Name)
-            {
-                Tag = domain
-            };
-
-            listViewItem.SubItems.Add(domain.FormattedValues);
-
-            DomainsListView.Items.Add(listViewItem);
-        }
     }
 
     #region MenuFile
@@ -125,7 +41,7 @@ public partial class MainForm : Form
 
     private void MenuFileExit_Click(object sender, EventArgs e)
     {
-        MessageBox.Show("Exit!");
+   
     }
 
     #endregion
@@ -148,36 +64,141 @@ public partial class MainForm : Form
 
     private void AddRuleButton_Click(object sender, EventArgs e)
     {
-        using var ruleForm = new RuleForm(_expertSystemShell.Variables, _expertSystemShell.Domains);
+        using var ruleForm = new RuleForm(_knowledgeBase);
         var result = ruleForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
+            var rule = ruleForm.Rule!;
+            var selectedIndex = GetSelectedIndex(RulesListView);
 
+            if (selectedIndex > - 1)
+            {
+                _knowledgeBase.Rules.Insert(selectedIndex, rule);
+            }
+            else
+            {
+                _knowledgeBase.Rules.Add(rule);
+            }
+
+            AddRuleToListView(rule, selectedIndex);
         }
+
+        DisplayVariables();
+        DisplayDomains();
     }
 
     private void EditRuleButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = RulesListView.SelectedItems[0];
-        var variable = selectedItem.Tag as Rule;
-        var usedNames = _expertSystemShell.Rules.GetNames();
+        var selectedItem = GetSelectedItem(RulesListView);
+        var rule = selectedItem.Tag as Rule;
 
-        //using var ruleForm = new RuleForm(usedNames, variable!, _domains);
-        //var result = variableForm.ShowDialog();
+        using var ruleForm = new RuleForm(_knowledgeBase, rule!);
+        var result = ruleForm.ShowDialog();
 
-        //if (result == DialogResult.OK)
+        if (result == DialogResult.OK)
         {
-            //var newDomain = domainForm.Domain;
-            //_domains.Add(newDomain);
-            //AddDomainToListView(newDomain);
+            rule = ruleForm.Rule!;
+            UpdateRuleInListView(rule, selectedItem);
+            UpdateRulesListBoxes();
         }
+
+        DisplayVariables();
+        DisplayDomains();
+    }
+
+    private void DeleteRuleButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = GetSelectedItem(RulesListView);
+        var rule = selectedItem.Tag as Rule;
+
+        _knowledgeBase.Rules.Remove(rule!);
+        RulesListView.Items.Remove(selectedItem);
     }
 
     private void RulesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var isAnyItemSelected = RulesListView.SelectedItems.Count > 0;
         EditRuleButton.Enabled = DeleteRuleButton.Enabled = isAnyItemSelected;
+
+        if (!isAnyItemSelected)
+        {
+            ConditionPartListBox.Items.Clear();
+            ActionPartListBox.Items.Clear();
+            return;
+        }
+
+        UpdateRulesListBoxes();
+    }
+
+    private void AddRuleToListView(Rule rule, int index = -1)
+    {
+        var item = index == -1 ? RulesListView.Items.Add(rule.Name) : RulesListView.Items.Insert(index + 1, rule.Name);
+        item.SubItems.Add(rule.FormattedRule);
+        item.Tag = rule;
+
+        ResizeListView(RulesListView);
+    }
+
+    private void UpdateRuleInListView(Rule rule, ListViewItem listViewItem)
+    {
+        listViewItem.SubItems[0].Text = rule.Name;
+        listViewItem.SubItems[1].Text = rule.FormattedRule;
+
+        ResizeListView(RulesListView);
+    }
+
+    private void UpdateRulesListBoxes()
+    {
+        var selectedItem = GetSelectedItem(RulesListView);
+        var rule = selectedItem.Tag as Rule;
+
+        ConditionPartListBox.Items.Clear();
+
+        foreach (var fact in rule!.ConditionPart)
+        {
+            ConditionPartListBox.Items.Add(fact.FormattedFact);
+        }
+
+        ActionPartListBox.Items.Clear();
+
+        foreach (var fact in rule.ActionPart)
+        {
+            ActionPartListBox.Items.Add(fact.FormattedFact);
+        }
+    }
+
+    private void RulesListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
+
+    private void RulesListView_DragEnter(object sender, DragEventArgs e) => e.Effect = DragDropEffects.Move;
+
+    private void RulesListView_DragDrop(object sender, DragEventArgs e)
+    {
+        var startIndex = GetSelectedIndex(RulesListView);
+
+        var point = RulesListView.PointToClient(new Point(e.X, e.Y));
+        var item = RulesListView.GetItemAt(point.X, point.Y);
+
+        if (item is null)
+        {
+            return;
+        }
+
+        var endIndex = item.Index;
+
+        if (startIndex == endIndex)
+        {
+            return;
+        }
+
+        item = RulesListView.Items[startIndex];
+        var rule = item.Tag as Rule;
+
+        _knowledgeBase.Rules.RemoveAt(startIndex);
+        _knowledgeBase.Rules.Insert(endIndex, rule!);
+
+        RulesListView.Items.RemoveAt(startIndex);
+        RulesListView.Items.Insert(endIndex, item);
     }
 
     #endregion
@@ -186,55 +207,60 @@ public partial class MainForm : Form
 
     private void AddVariableButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _expertSystemShell.Variables.GetNames();
+        var usedNames = _knowledgeBase.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, _expertSystemShell.Domains);
+        using var variableForm = new VariableForm(usedNames, _knowledgeBase.Domains);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
-            var newVariable = variableForm.Variable;
-            _expertSystemShell.Variables.Add(newVariable);
-            AddVariableToListView(newVariable);
+            var variable = variableForm.Variable!;
+            _knowledgeBase.Variables.Add(variable);
+            
+            AddVariableToListView(variable);
         }
-    }
 
-    private void AddVariableToListView(Variable variable)
-    {
-        var listViewItem = new ListViewItem(variable.Name)
-        {
-            Tag = variable
-        };
-
-        listViewItem.SubItems.Add(variable.FormattedType);
-        listViewItem.SubItems.Add(variable.Domain.Name);
-        VariablesListView.Items.Add(listViewItem);
-        VariablesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+        DisplayDomains();
     }
 
     private void EditVariableButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = VariablesListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(VariablesListView);
         var variable = selectedItem.Tag as Variable;
-        var usedNames = _expertSystemShell.Variables.GetNames();
 
-        using var variableForm = new VariableForm(usedNames, variable!, _expertSystemShell.Domains);
+        if (_knowledgeBase.IsVariableUsed(variable!))
+        {
+            ShowErrorMessageBox("–î–∞–Ω–Ω–∞—è –ø–µ—Ä–µ–º–µ–Ω–Ω–∞—è –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è, –ø–æ—ç—Ç–æ–º—É –µ—ë –Ω–µ–ª—å–∑—è –∏–∑–º–µ–Ω–∏—Ç—å");
+            return;
+        }
+
+        var usedNames = _knowledgeBase.Variables.GetNames();
+
+        using var variableForm = new VariableForm(usedNames, _knowledgeBase.Domains, variable!);
         var result = variableForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
-            //var newDomain = domainForm.Domain;
-            //_domains.Add(newDomain);
-            //AddDomainToListView(newDomain);
+            variable = variableForm.Variable!;
+            UpdateVariableInListView(variable, selectedItem);
+            UpdateVariableListBoxes();
         }
+
+        DisplayDomains();
     }
 
     private void DeleteVariableButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = VariablesListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(VariablesListView);
         var variable = selectedItem.Tag as Variable;
 
-        _expertSystemShell.Variables.Remove(variable!);
+        if (_knowledgeBase.IsVariableUsed(variable!))
+        {
+            ShowErrorMessageBox("–î–∞–Ω–Ω–∞—è –ø–µ—Ä–µ–º–µ–Ω–Ω–∞—è –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è, –ø–æ—ç—Ç–æ–º—É –µ—ë –Ω–µ–ª—å–∑—è —É–¥–∞–ª–∏—Ç—å");
+            return;
+        }
+
+        _knowledgeBase.Variables.Remove(variable!);
         VariablesListView.Items.Remove(selectedItem);
     }
 
@@ -253,21 +279,39 @@ public partial class MainForm : Form
         UpdateVariableListBoxes();
     }
 
+    private void AddVariableToListView(Variable variable)
+    {
+        var item = VariablesListView.Items.Add(variable.Name);
+        item.SubItems.Add(variable.FormattedType);
+        item.SubItems.Add(variable.Domain.Name);
+        item.Tag = variable;
+
+        ResizeListView(VariablesListView);
+    }
+
+    private void UpdateVariableInListView(Variable variable, ListViewItem listViewItem)
+    {
+        listViewItem.SubItems[0].Text = variable.Name;
+        listViewItem.SubItems[1].Text = variable.FormattedType;
+        listViewItem.SubItems[2].Text = variable.Domain.Name;
+
+        ResizeListView(VariablesListView);
+    }
+
     private void UpdateVariableListBoxes()
     {
-        DomainValuesListBox.Items.Clear();
-
-        var selectedItem = VariablesListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(VariablesListView);
         var variable = selectedItem.Tag as Variable;
+
+        DomainValuesListBox.Items.Clear();
 
         foreach (var value in variable!.Domain.Values)
         {
-            DomainValuesListBox.Items.Add(value);
+            DomainValuesListBox.Items.Add(value.Value);
         }
 
         QuestionListBox.Items.Clear();
-
-        QuestionListBox.Items.Add(variable!.Question ?? string.Empty);
+        QuestionListBox.Items.Add(variable.Question);
     }
 
     #endregion
@@ -276,42 +320,49 @@ public partial class MainForm : Form
 
     private void AddDomainButton_Click(object sender, EventArgs e)
     {
-        var usedNames = _expertSystemShell.Domains.GetNames();
+        var usedNames = _knowledgeBase.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames);
         var result = domainForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
-            var newDomain = domainForm.Domain;
-            _expertSystemShell.Domains.Add(newDomain);
-            AddDomainToListView(newDomain);
+            var domain = domainForm.Domain!;
+            _knowledgeBase.Domains.Add(domain);
+            
+            AddDomainToListView(domain);
         }
     }
 
     private void EditDomainButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = DomainsListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(DomainsListView);
         var domain = selectedItem.Tag as Domain;
-        var usedNames = _expertSystemShell.Domains.GetNames();
+        var usedNames = _knowledgeBase.Domains.GetNames();
 
         using var domainForm = new DomainForm(usedNames, domain!);
         var result = domainForm.ShowDialog();
 
         if (result == DialogResult.OK)
         {
-            var updatedDomain = domainForm.Domain;
-            UpdateDomainInListView(updatedDomain, selectedItem);
+            domain = domainForm.Domain!;
+            UpdateDomainInListView(domain, selectedItem);
             UpdateDomainValuesListBox();
         }
     }
 
     private void DeleteDomainButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = DomainsListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(DomainsListView);
         var domain = selectedItem.Tag as Domain;
 
-        _expertSystemShell.Domains.Remove(domain!);
+        if (_knowledgeBase.IsDomainUsed(domain!))
+        {
+            ShowErrorMessageBox("–î–∞–Ω–Ω—ã–π –¥–æ–º–µ–Ω –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è, –ø–æ—ç—Ç–æ–º—É –µ–≥–æ –Ω–µ–ª—å–∑—è —É–¥–∞–ª–∏—Ç—å");
+            return;
+        }
+
+        _knowledgeBase.Domains.Remove(domain!);
         DomainsListView.Items.Remove(selectedItem);
     }
 
@@ -331,36 +382,129 @@ public partial class MainForm : Form
 
     private void AddDomainToListView(Domain domain)
     {
-        var listViewItem = new ListViewItem(domain.Name)
-        {
-            Tag = domain
-        };
-        
-        listViewItem.SubItems.Add(domain.FormattedValues);
-        DomainsListView.Items.Add(listViewItem);
-        DomainsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+        var item = DomainsListView.Items.Add(domain.Name);
+        item.SubItems.Add(domain.FormattedValues);
+        item.Tag = domain;
+
+        ResizeListView(DomainsListView);
     }
 
     private void UpdateDomainInListView(Domain domain, ListViewItem listViewItem)
     {
         listViewItem.SubItems[0].Text = domain.Name;
         listViewItem.SubItems[1].Text = domain.FormattedValues;
-        listViewItem.Tag = domain;
-        DomainsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
+        ResizeListView(DomainsListView);
     }
 
     private void UpdateDomainValuesListBox()
     {
-        ValuesListBox.Items.Clear();
-
-        var selectedItem = DomainsListView.SelectedItems[0];
+        var selectedItem = GetSelectedItem(DomainsListView);
         var domain = selectedItem.Tag as Domain;
+
+        ValuesListBox.Items.Clear();
 
         foreach (var value in domain!.Values)
         {
-            ValuesListBox.Items.Add(value);
+            ValuesListBox.Items.Add(value.Value);
         }
     }
+
+    #endregion
+
+    #region UtilityMethods
+
+    private static void InitializeListView(ListView listView, List<string> columns)
+    {
+        foreach (var column in columns)
+        {
+            listView.Columns.Add(column);
+        }
+
+        listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+    }
+
+    private void PopulateLists()
+    {
+        var yesDomainValue = new DomainValue("–î–∞", true);
+        var noDomainValue = new DomainValue("–ù–µ—Ç");
+
+        var yesNoDomain = new Domain("–î–∞ / –ù–µ—Ç", new List<DomainValue>() { yesDomainValue, noDomainValue });
+
+        var highDomainValue = new DomainValue("–í—ã—Å–æ–∫–∏–π");
+        var mediumDomainValue = new DomainValue("–°—Ä–µ–¥–Ω–∏–π");
+        var lowDomainValue = new DomainValue("–ù–∏–∑–∫–∏–π");
+
+        var highMediumLowDomain = new Domain("–í—ã—Å–æ–∫–∏–π / –°—Ä–µ–¥–Ω–∏–π/ –ù–∏–∑–∫–∏–π", new List<DomainValue>() { highDomainValue, mediumDomainValue, lowDomainValue });
+
+        _knowledgeBase.Domains.Add(yesNoDomain);
+        _knowledgeBase.Domains.Add(highMediumLowDomain);
+
+        var smokingVariable = new Variable("–ö—É—Ä–µ–Ω–∏–µ", string.Empty, yesNoDomain, VariableType.Inferred);
+        var heightVariable = new Variable("–†–æ—Å—Ç", "–º—è—É", highMediumLowDomain, VariableType.Requested);
+        var weightVariable = new Variable("–í–µ—Å", string.Empty, highMediumLowDomain, VariableType.Requested);
+
+        _knowledgeBase.Variables.Add(smokingVariable);
+        _knowledgeBase.Variables.Add(heightVariable);
+        _knowledgeBase.Variables.Add(weightVariable);
+
+        var rule1 = new Rule("R1", "Meow", new List<Fact> { new(weightVariable, mediumDomainValue), new(heightVariable, highDomainValue) }, new List<Fact> { new(smokingVariable, noDomainValue) });
+        var rule2 = new Rule("R2", "Woof", new List<Fact> { new(weightVariable, highDomainValue), new(heightVariable, highDomainValue) }, new List<Fact> { new(smokingVariable, yesDomainValue) });
+
+        _knowledgeBase.Rules.Add(rule1);
+        _knowledgeBase.Rules.Add(rule2);
+    }
+
+    private void InitializeListViews()
+    {
+        InitializeListView(RulesListView, new List<string> { "–ò–º—è", "–û–ø–∏—Å–∞–Ω–∏–µ" });
+        DisplayRules();
+
+        InitializeListView(VariablesListView, new List<string> { "–ò–º—è", "–¢–∏–ø", "–î–æ–º–µ–Ω" });
+        DisplayVariables();
+
+        InitializeListView(DomainsListView, new List<string> { "–ò–º—è", "–ó–Ω–∞—á–µ–Ω–∏—è" });
+        DisplayDomains();
+    }
+
+    private void DisplayRules()
+    {
+        RulesListView.Items.Clear();
+
+        foreach (var rule in _knowledgeBase.Rules)
+        {
+            AddRuleToListView(rule);
+        }
+    }
+
+    private void DisplayVariables()
+    {
+        VariablesListView.Items.Clear();
+
+        foreach (var variable in _knowledgeBase.Variables)
+        {
+            AddVariableToListView(variable);
+        }
+    }
+
+    private void DisplayDomains()
+    {
+        DomainsListView.Items.Clear();
+
+        foreach (var domain in _knowledgeBase.Domains)
+        {
+            AddDomainToListView(domain);
+        }
+    }
+
+    private static ListViewItem GetSelectedItem(ListView listView) => listView.SelectedItems[0];
+
+    private static int GetSelectedIndex(ListView listView) => listView.SelectedIndices.Count > 0 ? listView.SelectedIndices[0] : -1;
+
+    private static void ResizeListView(ListView listView) => listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "–û—à–∏–±–∫–∞", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
     #endregion
 }

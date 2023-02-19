@@ -10,9 +10,9 @@ public partial class VariableForm : Form
 
     private readonly Domains _domains;
 
-    private string? _questionText;
+    private string _questionText = string.Empty;
 
-    public Variable Variable { get; private set; } = null!;
+    public Variable? Variable { get; private set; }
 
     public VariableForm(List<string> usedNames, Domains domains)
     {
@@ -27,7 +27,7 @@ public partial class VariableForm : Form
         InitializeDomainsComboBox();
     }
 
-    public VariableForm(List<string> usedNames, Variable variable, Domains domains)
+    public VariableForm(List<string> usedNames, Domains domains, Variable variable)
     {
         InitializeComponent();
         Text = "Редактирование переменной";
@@ -45,21 +45,22 @@ public partial class VariableForm : Form
 
         if (IsNameUsed(name))
         {
-            ShowErrorMessageBox("Переменная с данным именем уже существует");
+            ShowErrorMessageBox($"Переменная с именем \"{name}\" уже существует");
             return;
         }
 
         var question = GetQuestion();
 
-        if (IsQuestionSkipped(question) && !IsQuestionValid())
+        if (IsQuestionSkipped(question) && !IsDefaultQuestion(name))
         {
             return;
         }
 
+        question = GetFinalQuestion(question);
         var domain = GetDomain();
         var variableType = GetVariableType();
 
-        SetVariable(name, domain, variableType, question);
+        SetVariable(name, question, domain, variableType);
         DialogResult = DialogResult.OK;
     }
 
@@ -72,7 +73,7 @@ public partial class VariableForm : Form
 
         if (result == DialogResult.OK)
         {
-            var domain = domainForm.Domain;
+            var domain = domainForm.Domain!;
             _domains.Add(domain);
 
             AddDomainToComboBox(domain);
@@ -99,31 +100,46 @@ public partial class VariableForm : Form
 
     private void RequestedInferredOption_CheckedChanged(object sender, EventArgs e) => UpdateRadioButtons();
 
-    private void SetVariable(string name, Domain domain, VariableType variableType, string? question)
+    private void SetVariable(string name, string question, Domain domain, VariableType variableType)
     {
         if (Variable is null)
         {
-            Variable = new Variable(name, domain, variableType, question);
+            Variable = new Variable(name, question, domain, variableType);
             return;
         }
 
         Variable.Name = name;
+        Variable.Question = question;
         Variable.Domain = domain;
         Variable.Type = variableType;
-        Variable.Question = question;
     }
 
     private string GetName() => VariableNameTextBox.Text.Trim();
 
     private bool IsNameUsed(string name) => _usedNames.Contains(name) && name != Variable?.Name;
 
-    private string? GetQuestion() => QuestionTextBox.Text.Trim();
+    private string GetQuestion() => QuestionTextBox.Text.Trim();
 
-    private bool IsQuestionSkipped(string? question) => IsQuestionAvailable() && string.IsNullOrWhiteSpace(question);
-
-    private static bool IsQuestionValid()
+    private string GetFinalQuestion(string question)
     {
-        var result = MessageBox.Show("Вы не ввели вопрос для переменной, продолжить без него?", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        var variableType = GetVariableType();
+
+        if (variableType is VariableType.Inferred)
+        {
+            return string.Empty;
+        }
+
+        var name = GetName();
+
+        return string.IsNullOrWhiteSpace(question) ? $"{name}?" : question;
+    }
+
+    private bool IsQuestionSkipped(string question) => IsQuestionAvailable() && string.IsNullOrWhiteSpace(question);
+
+    private static bool IsDefaultQuestion(string name)
+    {
+        var result = MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: \"{name}?\"",
+            "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         return result == DialogResult.Yes;
     }
 
@@ -137,13 +153,13 @@ public partial class VariableForm : Form
 
     private VariableType GetVariableType()
     {
-        if (RequestedInferredOption.Checked)
+        if (RequestedOption.Checked)
         {
             return VariableType.Requested;
         }
         else if (InferredOption.Checked)
         {
-            return VariableType.RequestedInferred;
+            return VariableType.Inferred;
         }
         else
         {
@@ -153,15 +169,12 @@ public partial class VariableForm : Form
 
     private void InitializeComponents()
     {
-        VariableNameTextBox.Text = Variable.Name;
+        VariableNameTextBox.Text = Variable!.Name;
 
         InitializeDomainsComboBox();
         InitializeRadioButtons();
 
-        if (Variable.Question is not null)
-        {
-            QuestionTextBox.Text = Variable.Question;
-        }
+        QuestionTextBox.Text = Variable.Question;
     }
 
     private void InitializeDomainsComboBox()
@@ -179,7 +192,7 @@ public partial class VariableForm : Form
 
     private void InitializeRadioButtons()
     {
-        switch (Variable.Type)
+        switch (Variable!.Type)
         {
             case VariableType.Requested:
                 RequestedOption.Checked = true;
@@ -193,16 +206,20 @@ public partial class VariableForm : Form
         }
     }
 
-    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    private bool IsDomainSelected() => DomainComboBox.SelectedIndex > -1;
 
-    private bool IsComboboxItemSelected() => DomainComboBox.SelectedIndex > -1;
+    private void AddDomainToComboBox(Domain domain)
+    {
+        DomainComboBox.Items.Add(domain.Name);
+        DomainComboBox.SelectedItem = domain.Name;
+    }
 
     private void UpdateQuestionBoxAvailability() => QuestionTextBox.Enabled = !InferredOption.Checked;
 
     private void UpdateOkButtonAvailability()
     {
         var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsComboboxItemSelected();
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsDomainSelected();
     }
 
     private void UpdateRadioButtons()
@@ -213,9 +230,5 @@ public partial class VariableForm : Form
         UpdateOkButtonAvailability();
     }
 
-    private void AddDomainToComboBox(Domain domain)
-    {
-        DomainComboBox.Items.Add(domain.Name);
-        DomainComboBox.SelectedItem = domain.Name;
-    }
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }

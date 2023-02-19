@@ -1,105 +1,271 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
 
-namespace ExpertSystemsShell.Forms
+namespace ExpertSystemsShell.Forms;
+
+public partial class RuleForm : Form
 {
-    public partial class RuleForm : Form
+    private readonly KnowledgeBase _knowledgeBase;
+
+    private readonly List<Fact> _conditionPart = new();
+
+    private readonly List<Fact> _actionPart = new();
+
+    public Rule? Rule { get; private set; }
+
+    public RuleForm(KnowledgeBase knowledgeBase)
     {
-        private readonly Variables _variables;
+        InitializeComponent();
+        Text = "Создание правила";
+        OkButton.Enabled = false;
 
-        private readonly Domains _domains;
+        _knowledgeBase = knowledgeBase;
+    }
 
-        private readonly List<Fact> _conditionPart = new();
+    public RuleForm(KnowledgeBase knowledgeBase, Rule rule)
+    {
+        InitializeComponent();
+        Text = "Редактирование правила";
 
-        private readonly List<Fact> _actionPart = new();
+        _knowledgeBase= knowledgeBase;
+        _conditionPart = rule.ConditionPart;
+        _actionPart = rule.ActionPart;
+        Rule = rule;
 
-        public Rule Rule { get; private set; } = null!;
+        InitializeComponents();
+    }
 
-        public RuleForm(Variables variables, Domains domains)
+    private void OkButton_Click(object sender, EventArgs e)
+    {
+        var name = GetName();
+
+        if (IsNameUsed(name))
         {
-            InitializeComponent();
-            Text = "Создание правила";
-
-            _variables= variables;
-            _domains = domains;
+            ShowErrorMessageBox($"Правило с именем \"{name}\" уже существует");
+            return;
         }
 
-        public RuleForm(Variables variables, Domains domains, Rule rule)
+        if (!IsConditionPartUnique(_conditionPart))
         {
-            InitializeComponent();
-            Text = "Редактирование правила";
-
-            _variables = variables;
-            _domains = domains;
-            Rule = rule;
+            ShowErrorMessageBox("Правило с такой посылкой уже существует");
+            return;
         }
 
-        private void OkButton_Click(object sender, EventArgs e)
-        {
+        var reason = GetReason();
 
+        SetRule(name, reason, _conditionPart, _actionPart);
+        DialogResult = DialogResult.OK;
+    }
+
+    private void ConditionPartAddButton_Click(object sender, EventArgs e)
+    {
+        var usedVariables = GetConditionPartUsedVariables();
+
+        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, true);
+        var result = factForm.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var fact = factForm.Fact!;
+
+            _conditionPart.Add(fact);
+
+            AddItemToListView(ConditionPartListView, fact);
+            UpdateOkButtonAvailability();
+        }
+    }
+
+    private void ConditionPartEditButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = GetSelectedItem(ConditionPartListView);
+        var fact = selectedItem.Tag as Fact;
+
+        var usedVariables = GetConditionPartUsedVariables();
+        usedVariables.Remove(fact!.Variable.Name);
+
+        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, fact, true);
+        var result = factForm.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var index = _conditionPart.IndexOf(fact);
+            fact = factForm.Fact;
+
+            _conditionPart[index].Variable = fact!.Variable;
+            _conditionPart[index].Value = fact.Value;
+
+            selectedItem.Text = fact.FormattedFact;
+            UpdateOkButtonAvailability();
+        }
+    }
+
+    private void ConditionPartDeleteButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = GetSelectedItem(ConditionPartListView);
+        var fact = selectedItem.Tag as Fact;
+
+        _conditionPart.Remove(fact!);
+
+        ConditionPartListView.Items.Remove(selectedItem);
+        UpdateOkButtonAvailability();
+    }
+
+    private void ConditionPartListView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var isAnyFactSelected = ConditionPartListView.SelectedItems.Count > 0;
+        ConditionPartEditButton.Enabled = ConditionPartDeleteButton.Enabled = isAnyFactSelected;
+    }
+
+    private void ActionPartAddButton_Click(object sender, EventArgs e)
+    {
+        var usedVariables = GetActionPartUsedVariables();
+
+        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, false);
+        var result = factForm.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var fact = factForm.Fact!;
+
+            _actionPart.Add(fact);
+
+            AddItemToListView(ActionPartListView, fact);
+            UpdateOkButtonAvailability();
+        }
+    }
+
+    private void ActionPartEditButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = GetSelectedItem(ActionPartListView);
+        var fact = selectedItem.Tag as Fact;
+
+        var usedVariables = GetActionPartUsedVariables();
+        usedVariables.Remove(fact!.Variable.Name);
+
+        using var factForm = new FactForm(usedVariables, _knowledgeBase.Variables, _knowledgeBase.Domains, fact, false);
+        var result = factForm.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            var index = _actionPart.IndexOf(fact);
+            fact = factForm.Fact!;
+
+            _actionPart[index].Variable = fact.Variable;
+            _actionPart[index].Value = fact.Value;
+
+            selectedItem.Text = fact.FormattedFact;
+            UpdateOkButtonAvailability();
+        }
+    }
+
+    private void ActionPartDeleteButton_Click(object sender, EventArgs e)
+    {
+        var selectedItem = GetSelectedItem(ActionPartListView);
+        var fact = selectedItem.Tag as Fact;
+
+        _actionPart.Remove(fact!);
+
+        ActionPartListView.Items.Remove(selectedItem);
+        UpdateOkButtonAvailability();
+    }
+
+    private void ActionPartListView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var isAnyFactSelected = ActionPartListView.SelectedItems.Count > 0;
+        ActionPartEditButton.Enabled = ActionPartDeleteButton.Enabled = isAnyFactSelected;
+    }
+
+    private void RuleNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
+
+    private void SetRule(string name, string reason, List<Fact> conditionPart, List<Fact> actionPart)
+    {
+        if (Rule is null)
+        {
+            Rule = new Rule(name, reason, conditionPart, actionPart);
+            return;
         }
 
-        private void CondtionPartAddButton_Click(object sender, EventArgs e)
-        {
-            using var factForm = new FactForm(_variables, _domains);
-            var result = factForm.ShowDialog();
+        Rule.Name = name;
+        Rule.Reason = reason;
+        Rule.ConditionPart = conditionPart;
+        Rule.ActionPart = actionPart;
+    }
 
-            if (result == DialogResult.OK)
+    private string GetName() => RuleNameTextBox.Text.Trim();
+
+    private bool IsNameUsed(string name) => _knowledgeBase.Rules.Any(r => r.Name == name) && name != Rule?.Name;
+
+    private string GetReason() => ReasonTextBox.Text.Trim();
+
+    private bool IsConditionPartUnique(List<Fact> conditionPart)
+    {
+        foreach (var rule in _knowledgeBase.Rules)
+        {
+            if (!IsFactsNumberMatched(rule, conditionPart))
             {
-                var fact = factForm.Fact;
+                continue;
+            }
 
-                _conditionPart.Add(fact);
-
-
+            var isConditionPartMatched = conditionPart
+                .Select(nf => rule.ConditionPart.Any(f => nf.Variable == f.Variable && nf.Value == f.Value))
+                .All(isFactExisted => isFactExisted);
+            
+            if (isConditionPartMatched)
+            {
+                return false;
             }
         }
 
-        private void CondtionPartEditButton_Click(object sender, EventArgs e)
+        return true;
+    }
+
+    private static bool IsFactsNumberMatched(Rule rule, List<Fact> conditionPart) => conditionPart.Count == rule.ConditionPart.Count;
+
+    private List<string> GetConditionPartUsedVariables() => _conditionPart.Select(v => v.Variable.Name).ToList();
+
+    private List<string> GetActionPartUsedVariables() => _actionPart.Select(v => v.Variable.Name).ToList();
+
+    private void InitializeComponents()
+    {
+        RuleNameTextBox.Text = Rule!.Name;
+        ReasonTextBox.Text = Rule.Reason;
+
+        InitializeConditionPartListView();
+        InitializeActionPartListView();
+    }
+
+    private void InitializeConditionPartListView()
+    {
+        foreach (var fact in Rule!.ConditionPart)
         {
-            //using var factForm = new FactForm(_variables, _domains, new Fact(_variables.g, "100");
-           // var result = factForm.ShowDialog();
-        }
-
-        private void CondtionPartDeleteButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ConditionPartListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ActionPartAddButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ActionPartEditButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ActionPartDeleteButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ActionPartListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void RuleNameTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ReasonTextBox_TextChanged(object sender, EventArgs e)
-        {
-
+            AddItemToListView(ConditionPartListView, fact);
         }
     }
+
+    private void InitializeActionPartListView()
+    {
+        foreach (var fact in Rule!.ActionPart)
+        {
+            AddItemToListView(ActionPartListView, fact);
+        }
+    }
+
+    private void UpdateOkButtonAvailability()
+    {
+        var name = GetName();
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && ConditionPartListView.Items.Count > 0 && ActionPartListView.Items.Count > 0;
+    }
+
+    private static void AddItemToListView(ListView listView, Fact fact)
+    {
+        var item = listView.Items.Add(fact.FormattedFact);
+        item.Tag = fact;
+    }
+
+    private static ListViewItem GetSelectedItem(ListView listView) => listView.SelectedItems[0];
+    
+    private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 }
