@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
+using ExpertSystemsShell.Modules;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -31,8 +32,7 @@ public partial class RuleForm : Form
         Text = "Редактирование правила";
 
         _knowledgeBase= knowledgeBase;
-        _conditionPart = rule.ConditionPart;
-        _actionPart = rule.ActionPart;
+        InitializeParts(rule.ConditionPart, rule.ActionPart);
         Rule = rule;
 
         InitializeComponents();
@@ -194,6 +194,21 @@ public partial class RuleForm : Form
         Rule.ActionPart = actionPart;
     }
 
+    private void InitializeParts(List<Fact> conditionPart, List<Fact> actionPart)
+    {
+        foreach (var fact in conditionPart) 
+        {
+            var newFact = new Fact(fact.Variable, fact.Value);
+            _conditionPart.Add(newFact);
+        }
+
+        foreach (var fact in actionPart)
+        {
+            var newFact = new Fact(fact.Variable, fact.Value);
+            _actionPart.Add(newFact);
+        }
+    }
+
     private string GetName() => RuleNameTextBox.Text.Trim();
 
     private bool IsNameUsed(string name) => _knowledgeBase.Rules.Any(r => r.Name == name) && name != Rule?.Name;
@@ -239,7 +254,7 @@ public partial class RuleForm : Form
 
     private void InitializeConditionPartListView()
     {
-        foreach (var fact in Rule!.ConditionPart)
+        foreach (var fact in _conditionPart)
         {
             AddItemToListView(ConditionPartListView, fact);
         }
@@ -247,7 +262,7 @@ public partial class RuleForm : Form
 
     private void InitializeActionPartListView()
     {
-        foreach (var fact in Rule!.ActionPart)
+        foreach (var fact in _actionPart)
         {
             AddItemToListView(ActionPartListView, fact);
         }
