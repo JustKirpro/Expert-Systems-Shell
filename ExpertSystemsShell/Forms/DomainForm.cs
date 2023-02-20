@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Modules;
+using ExpertSystemsShell.Components;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -21,6 +21,7 @@ public partial class DomainForm : Form
         InitializeComponent();
         Text = "Создание домена";
         OkButton.Enabled = false;
+        DomainNameTextBox.Text = knowledgeBase.GetNextDomainName();
 
         _knowledgeBase = knowledgeBase;
     }
@@ -113,22 +114,20 @@ public partial class DomainForm : Form
 
     private void ValuesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var isAnyValueSelected = ValuesListView.SelectedItems.Count > 0;
-        DeleteButton.Enabled = isAnyValueSelected;
+        var isAnyValueSelected = IsAnyValueSelected();
+        var isValueValid = IsValueValid();
 
-        var value = GetValue();
-        var isValueValid = !string.IsNullOrWhiteSpace(value);
+        DeleteButton.Enabled = isAnyValueSelected;
         EditButton.Enabled = isAnyValueSelected && isValueValid;
     }
 
     private void ValueTextBox_TextChanged(object sender, EventArgs e)
     {
-        var value = GetValue();
-        var isValueValid = !string.IsNullOrWhiteSpace(value);
+        var isAnyValueSelected = IsAnyValueSelected();
+        var isValueValid = IsValueValid();
+        
         AddButton.Enabled = isValueValid;
-
-        var isAnyValueSelected = ValuesListView.SelectedItems.Count > 0;
-        EditButton.Enabled = isValueValid && isAnyValueSelected;
+        EditButton.Enabled = isAnyValueSelected && isValueValid;
     }
     
     private void DomainNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
@@ -184,7 +183,13 @@ public partial class DomainForm : Form
 
     private bool IsNameUsed(string name) => _knowledgeBase.IsDomainNameUsed(name) && name != Domain?.Name;
 
+    private bool IsNameValid() => !string.IsNullOrWhiteSpace(GetName());
+
     private string GetValue() => ValueTextBox.Text.Trim();
+
+    private bool IsValueValid() => !string.IsNullOrWhiteSpace(GetValue());
+
+    private bool IsAnyValueSelected() => ValuesListView.SelectedItems.Count > 0;
 
     private bool IsValueAlreadyExists(string value) => _values.Any(v => v.Value == value);
 
@@ -198,8 +203,7 @@ public partial class DomainForm : Form
 
         foreach (var value in Domain.Values)
         {
-            var item = ValuesListView.Items.Add(value.Value);
-            item.Tag = value;
+            AddItemToListView(value);
         }
     }
 
@@ -215,11 +219,7 @@ public partial class DomainForm : Form
 
     private void RemoveItemFromListView(ListViewItem item) => ValuesListView.Items.Remove(item);
 
-    private void UpdateOkButtonAvailability()
-    {
-        var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsAnyValueAdded();
-    }
+    private void UpdateOkButtonAvailability() => OkButton.Enabled = IsNameValid() && IsAnyValueAdded();
 
     private void ResetValueTextBox() => ValueTextBox.Text = string.Empty;
 

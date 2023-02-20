@@ -50,12 +50,19 @@ public partial class MainForm : Form
 
     private void MenuConsultationStart_Click(object sender, EventArgs e)
     {
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var consultationForms = new ConsultationForm(knowledgeBase);
+        var result = consultationForms.ShowDialog();
 
+        if (result == DialogResult.OK)
+        {
+
+        }
     }
 
     private void MenuConsultationExplain_Click(object sender, EventArgs e)
     {
-
+        _expertSystemShell.
     }
 
     #endregion
@@ -76,11 +83,11 @@ public partial class MainForm : Form
 
             if (selectedIndex > - 1)
             {
-                knowledgeBase.InsertRule(selectedIndex, rule);
+                knowledgeBase.Rules.Insert(selectedIndex, rule);
             }
             else
             {
-                knowledgeBase.AddRule(rule);
+                knowledgeBase.Rules.Add(rule);
             }
 
             AddRuleToListView(rule, selectedIndex);
@@ -116,7 +123,7 @@ public partial class MainForm : Form
         var selectedItem = GetSelectedItem(RulesListView);
         var rule = (Rule)selectedItem.Tag;
 
-        knowledgeBase.RemoveRule(rule);
+        knowledgeBase.Rules.Remove(rule);
         RulesListView.Items.Remove(selectedItem);
     }
 
@@ -220,7 +227,7 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var variable = variableForm.Variable!;
-            knowledgeBase.AddVariable(variable);
+            knowledgeBase.Variables.Add(variable);
             
             AddVariableToListView(variable);
         }
@@ -265,7 +272,7 @@ public partial class MainForm : Form
             return;
         }
 
-        knowledgeBase.RemoveVariable(variable);
+        knowledgeBase.Variables.Remove(variable);
         VariablesListView.Items.Remove(selectedItem);
     }
 
@@ -333,7 +340,7 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var domain = domainForm.Domain!;
-            knowledgeBase.AddDomain(domain);
+            knowledgeBase.Domains.Add(domain);
             
             AddDomainToListView(domain);
         }
@@ -368,7 +375,7 @@ public partial class MainForm : Form
             return;
         }
 
-        knowledgeBase.RemoveDomain(domain);
+        knowledgeBase.Domains.Remove(domain);
         DomainsListView.Items.Remove(selectedItem);
     }
 

@@ -105,7 +105,7 @@ namespace ExpertSystemsShell.Forms
             this.MenuFileSaveAs,
             this.MenuFileExit});
             this.MenuFile.Name = "MenuFile";
-            this.MenuFile.Size = new System.Drawing.Size(90, 36);
+            this.MenuFile.Size = new System.Drawing.Size(90, 38);
             this.MenuFile.Text = "Файл";
             // 
             // MenuFileNew
@@ -166,6 +166,7 @@ namespace ExpertSystemsShell.Forms
             // 
             // MenuConsultationExplain
             // 
+            this.MenuConsultationExplain.Enabled = false;
             this.MenuConsultationExplain.Name = "MenuConsultationExplain";
             this.MenuConsultationExplain.Size = new System.Drawing.Size(428, 44);
             this.MenuConsultationExplain.Text = "Показать объяснение";

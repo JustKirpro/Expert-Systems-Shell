@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Modules;
+using ExpertSystemsShell.Components;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -70,7 +70,7 @@ public partial class FactForm : Form
         {
             var variable = variableForm.Variable!;
 
-            _knowledgeBase.AddVariable(variable);
+            _knowledgeBase.Variables.Add(variable);
 
             if (IsVariableAvailable(variable)) 
             {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Modules;
+using ExpertSystemsShell.Components;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -23,6 +23,7 @@ public partial class RuleForm : Form
         InitializeComponent();
         Text = "Создание правила";
         OkButton.Enabled = false;
+        RuleNameTextBox.Text = $"R{knowledgeBase.Rules.Count + 1}";
 
         _knowledgeBase = knowledgeBase;
     }

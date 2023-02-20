@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Modules;
+using ExpertSystemsShell.Components;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -19,6 +19,7 @@ public partial class VariableForm : Form
         Text = "Создание переменной";
         OkButton.Enabled = false;
         RequestedOption.Checked = true;
+        VariableNameTextBox.Text = $"Variable{knowledgeBase.Variables.Count + 1}";
 
         _knowledgeBase = knowledgeBase;
 
@@ -69,7 +70,7 @@ public partial class VariableForm : Form
         if (result == DialogResult.OK)
         {
             var domain = domainForm.Domain!;
-            _knowledgeBase.AddDomain(domain);
+            _knowledgeBase.Domains.Add(domain);
 
             AddDomainToComboBox(domain);
         }
