@@ -52,6 +52,8 @@ namespace ExpertSystemsShell.Forms
             this.EditRuleButton = new System.Windows.Forms.Button();
             this.AddRuleButton = new System.Windows.Forms.Button();
             this.VariablesTab = new System.Windows.Forms.TabPage();
+            this.VariableRuleGroupBox = new System.Windows.Forms.GroupBox();
+            this.VariableRuleListBox = new System.Windows.Forms.ListBox();
             this.VariablesListView = new System.Windows.Forms.ListView();
             this.QuestionTextGroupBox = new System.Windows.Forms.GroupBox();
             this.QuestionListBox = new System.Windows.Forms.ListBox();
@@ -62,6 +64,8 @@ namespace ExpertSystemsShell.Forms
             this.EditVariableButton = new System.Windows.Forms.Button();
             this.AddVariableButton = new System.Windows.Forms.Button();
             this.DomainsTab = new System.Windows.Forms.TabPage();
+            this.DomainVariableGroupBox = new System.Windows.Forms.GroupBox();
+            this.DomainVariableListBox = new System.Windows.Forms.ListBox();
             this.DomainsListView = new System.Windows.Forms.ListView();
             this.ValuesGroupBox = new System.Windows.Forms.GroupBox();
             this.ValuesListBox = new System.Windows.Forms.ListBox();
@@ -76,10 +80,12 @@ namespace ExpertSystemsShell.Forms
             this.ConditionPartGroupBox.SuspendLayout();
             this.EditRuleGroupBox.SuspendLayout();
             this.VariablesTab.SuspendLayout();
+            this.VariableRuleGroupBox.SuspendLayout();
             this.QuestionTextGroupBox.SuspendLayout();
             this.DomainValuesGroupBox.SuspendLayout();
             this.EditVariableGroupBox.SuspendLayout();
             this.DomainsTab.SuspendLayout();
+            this.DomainVariableGroupBox.SuspendLayout();
             this.ValuesGroupBox.SuspendLayout();
             this.EditDomainGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -105,7 +111,7 @@ namespace ExpertSystemsShell.Forms
             this.MenuFileSaveAs,
             this.MenuFileExit});
             this.MenuFile.Name = "MenuFile";
-            this.MenuFile.Size = new System.Drawing.Size(90, 38);
+            this.MenuFile.Size = new System.Drawing.Size(90, 36);
             this.MenuFile.Text = "Файл";
             // 
             // MenuFileNew
@@ -126,6 +132,7 @@ namespace ExpertSystemsShell.Forms
             // 
             // MenuFileSave
             // 
+            this.MenuFileSave.Enabled = false;
             this.MenuFileSave.Name = "MenuFileSave";
             this.MenuFileSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.MenuFileSave.Size = new System.Drawing.Size(343, 44);
@@ -183,6 +190,7 @@ namespace ExpertSystemsShell.Forms
             this.TabControl.SelectedIndex = 0;
             this.TabControl.Size = new System.Drawing.Size(1492, 882);
             this.TabControl.TabIndex = 1;
+            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // RulesTab
             // 
@@ -305,6 +313,7 @@ namespace ExpertSystemsShell.Forms
             // 
             // VariablesTab
             // 
+            this.VariablesTab.Controls.Add(this.VariableRuleGroupBox);
             this.VariablesTab.Controls.Add(this.VariablesListView);
             this.VariablesTab.Controls.Add(this.QuestionTextGroupBox);
             this.VariablesTab.Controls.Add(this.DomainValuesGroupBox);
@@ -317,10 +326,32 @@ namespace ExpertSystemsShell.Forms
             this.VariablesTab.Text = "Переменные";
             this.VariablesTab.UseVisualStyleBackColor = true;
             // 
+            // VariableRuleGroupBox
+            // 
+            this.VariableRuleGroupBox.Controls.Add(this.VariableRuleListBox);
+            this.VariableRuleGroupBox.Location = new System.Drawing.Point(889, 497);
+            this.VariableRuleGroupBox.Name = "VariableRuleGroupBox";
+            this.VariableRuleGroupBox.Size = new System.Drawing.Size(587, 229);
+            this.VariableRuleGroupBox.TabIndex = 10;
+            this.VariableRuleGroupBox.TabStop = false;
+            this.VariableRuleGroupBox.Text = "Используется в правилах:";
+            // 
+            // VariableRuleListBox
+            // 
+            this.VariableRuleListBox.FormattingEnabled = true;
+            this.VariableRuleListBox.HorizontalScrollbar = true;
+            this.VariableRuleListBox.ItemHeight = 32;
+            this.VariableRuleListBox.Location = new System.Drawing.Point(6, 31);
+            this.VariableRuleListBox.Name = "VariableRuleListBox";
+            this.VariableRuleListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.VariableRuleListBox.Size = new System.Drawing.Size(575, 196);
+            this.VariableRuleListBox.TabIndex = 0;
+            // 
             // VariablesListView
             // 
             this.VariablesListView.FullRowSelect = true;
             this.VariablesListView.Location = new System.Drawing.Point(0, 0);
+            this.VariablesListView.MultiSelect = false;
             this.VariablesListView.Name = "VariablesListView";
             this.VariablesListView.Size = new System.Drawing.Size(889, 822);
             this.VariablesListView.TabIndex = 9;
@@ -331,9 +362,9 @@ namespace ExpertSystemsShell.Forms
             // QuestionTextGroupBox
             // 
             this.QuestionTextGroupBox.Controls.Add(this.QuestionListBox);
-            this.QuestionTextGroupBox.Location = new System.Drawing.Point(889, 589);
+            this.QuestionTextGroupBox.Location = new System.Drawing.Point(889, 720);
             this.QuestionTextGroupBox.Name = "QuestionTextGroupBox";
-            this.QuestionTextGroupBox.Size = new System.Drawing.Size(587, 239);
+            this.QuestionTextGroupBox.Size = new System.Drawing.Size(587, 108);
             this.QuestionTextGroupBox.TabIndex = 6;
             this.QuestionTextGroupBox.TabStop = false;
             this.QuestionTextGroupBox.Text = "Текст вопроса:";
@@ -343,10 +374,10 @@ namespace ExpertSystemsShell.Forms
             this.QuestionListBox.FormattingEnabled = true;
             this.QuestionListBox.HorizontalScrollbar = true;
             this.QuestionListBox.ItemHeight = 32;
-            this.QuestionListBox.Location = new System.Drawing.Point(3, 38);
+            this.QuestionListBox.Location = new System.Drawing.Point(6, 34);
             this.QuestionListBox.Name = "QuestionListBox";
             this.QuestionListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.QuestionListBox.Size = new System.Drawing.Size(578, 196);
+            this.QuestionListBox.Size = new System.Drawing.Size(575, 68);
             this.QuestionListBox.TabIndex = 1;
             // 
             // DomainValuesGroupBox
@@ -354,7 +385,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainValuesGroupBox.Controls.Add(this.DomainValuesListBox);
             this.DomainValuesGroupBox.Location = new System.Drawing.Point(889, 253);
             this.DomainValuesGroupBox.Name = "DomainValuesGroupBox";
-            this.DomainValuesGroupBox.Size = new System.Drawing.Size(587, 330);
+            this.DomainValuesGroupBox.Size = new System.Drawing.Size(587, 238);
             this.DomainValuesGroupBox.TabIndex = 5;
             this.DomainValuesGroupBox.TabStop = false;
             this.DomainValuesGroupBox.Text = "Значения домена:";
@@ -367,7 +398,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.DomainValuesListBox.Name = "DomainValuesListBox";
             this.DomainValuesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.DomainValuesListBox.Size = new System.Drawing.Size(575, 292);
+            this.DomainValuesListBox.Size = new System.Drawing.Size(575, 196);
             this.DomainValuesListBox.TabIndex = 0;
             // 
             // EditVariableGroupBox
@@ -419,16 +450,38 @@ namespace ExpertSystemsShell.Forms
             // 
             // DomainsTab
             // 
+            this.DomainsTab.Controls.Add(this.DomainVariableGroupBox);
             this.DomainsTab.Controls.Add(this.DomainsListView);
             this.DomainsTab.Controls.Add(this.ValuesGroupBox);
             this.DomainsTab.Controls.Add(this.EditDomainGroupBox);
             this.DomainsTab.Location = new System.Drawing.Point(8, 46);
             this.DomainsTab.Name = "DomainsTab";
             this.DomainsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DomainsTab.Size = new System.Drawing.Size(1476, 828);
+            this.DomainsTab.Size = new System.Drawing.Size(1476, 826);
             this.DomainsTab.TabIndex = 2;
             this.DomainsTab.Text = "Домены";
             this.DomainsTab.UseVisualStyleBackColor = true;
+            // 
+            // DomainVariableGroupBox
+            // 
+            this.DomainVariableGroupBox.Controls.Add(this.DomainVariableListBox);
+            this.DomainVariableGroupBox.Location = new System.Drawing.Point(889, 534);
+            this.DomainVariableGroupBox.Name = "DomainVariableGroupBox";
+            this.DomainVariableGroupBox.Size = new System.Drawing.Size(587, 302);
+            this.DomainVariableGroupBox.TabIndex = 14;
+            this.DomainVariableGroupBox.TabStop = false;
+            this.DomainVariableGroupBox.Text = "Используется в переменных:";
+            // 
+            // DomainVariableListBox
+            // 
+            this.DomainVariableListBox.FormattingEnabled = true;
+            this.DomainVariableListBox.HorizontalScrollbar = true;
+            this.DomainVariableListBox.ItemHeight = 32;
+            this.DomainVariableListBox.Location = new System.Drawing.Point(6, 30);
+            this.DomainVariableListBox.Name = "DomainVariableListBox";
+            this.DomainVariableListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.DomainVariableListBox.Size = new System.Drawing.Size(575, 260);
+            this.DomainVariableListBox.TabIndex = 0;
             // 
             // DomainsListView
             // 
@@ -447,7 +500,7 @@ namespace ExpertSystemsShell.Forms
             this.ValuesGroupBox.Controls.Add(this.ValuesListBox);
             this.ValuesGroupBox.Location = new System.Drawing.Point(889, 268);
             this.ValuesGroupBox.Name = "ValuesGroupBox";
-            this.ValuesGroupBox.Size = new System.Drawing.Size(587, 556);
+            this.ValuesGroupBox.Size = new System.Drawing.Size(587, 267);
             this.ValuesGroupBox.TabIndex = 11;
             this.ValuesGroupBox.TabStop = false;
             this.ValuesGroupBox.Text = "Значения домена:";
@@ -460,7 +513,7 @@ namespace ExpertSystemsShell.Forms
             this.ValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.ValuesListBox.Name = "ValuesListBox";
             this.ValuesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.ValuesListBox.Size = new System.Drawing.Size(575, 516);
+            this.ValuesListBox.Size = new System.Drawing.Size(575, 228);
             this.ValuesListBox.TabIndex = 0;
             // 
             // EditDomainGroupBox
@@ -531,10 +584,12 @@ namespace ExpertSystemsShell.Forms
             this.ConditionPartGroupBox.ResumeLayout(false);
             this.EditRuleGroupBox.ResumeLayout(false);
             this.VariablesTab.ResumeLayout(false);
+            this.VariableRuleGroupBox.ResumeLayout(false);
             this.QuestionTextGroupBox.ResumeLayout(false);
             this.DomainValuesGroupBox.ResumeLayout(false);
             this.EditVariableGroupBox.ResumeLayout(false);
             this.DomainsTab.ResumeLayout(false);
+            this.DomainVariableGroupBox.ResumeLayout(false);
             this.ValuesGroupBox.ResumeLayout(false);
             this.EditDomainGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -583,5 +638,9 @@ namespace ExpertSystemsShell.Forms
         private Button DeleteDomainButton;
         private Button EditDomainButton;
         private Button AddDomainButton;
+        private GroupBox DomainVariableGroupBox;
+        private ListBox DomainVariableListBox;
+        private GroupBox VariableRuleGroupBox;
+        private ListBox VariableRuleListBox;
     }
 }
