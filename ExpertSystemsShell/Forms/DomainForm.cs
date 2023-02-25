@@ -16,6 +16,8 @@ public partial class DomainForm : Form
 
     public Domain? Domain { get; private set; }
 
+    #region Constructors
+
     public DomainForm(KnowledgeBase knowledgeBase)
     {
         InitializeComponent();
@@ -29,14 +31,17 @@ public partial class DomainForm : Form
     public DomainForm(KnowledgeBase knowledgeBase, Domain domain)
     {
         InitializeComponent();
+        InitializeControls(domain);
         Text = "Редактирование домена";
 
         _knowledgeBase = knowledgeBase;
-        _values = domain.Values;
+        CopyValues(domain);
         Domain = domain;
-
-        InitializeComponents();
     }
+
+    #endregion
+
+    #region Button events
 
     private void OkButton_Click(object sender, EventArgs e)
     {
@@ -56,7 +61,7 @@ public partial class DomainForm : Form
     {
         var value = GetValue();
 
-        if (IsValueAlreadyExists(value))
+        if (IsValueUsed(value))
         {
             ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
             return;
@@ -83,7 +88,7 @@ public partial class DomainForm : Form
 
         var value = GetValue();
 
-        if (IsValueAlreadyExists(value) && domainValue.Value != value)
+        if (IsValueUsed(value) && domainValue.Value != value)
         {
             ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
             return;
@@ -93,6 +98,7 @@ public partial class DomainForm : Form
         selectedItem.Text = value;
 
         ResetValueTextBox();
+        UpdateOkButtonAvailability();
     }
 
     private void DeleteButton_Click(object sender, EventArgs e)
@@ -108,9 +114,13 @@ public partial class DomainForm : Form
 
         _values.Remove(domainValue);
 
-        RemoveItemFromListView(selectedItem);
+        ValuesListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
     }
+
+    #endregion
+
+    #region ListView and TextBoxes events
 
     private void ValuesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -120,17 +130,6 @@ public partial class DomainForm : Form
         DeleteButton.Enabled = isAnyValueSelected;
         EditButton.Enabled = isAnyValueSelected && isValueValid;
     }
-
-    private void ValueTextBox_TextChanged(object sender, EventArgs e)
-    {
-        var isAnyValueSelected = IsAnyValueSelected();
-        var isValueValid = IsValueValid();
-        
-        AddButton.Enabled = isValueValid;
-        EditButton.Enabled = isAnyValueSelected && isValueValid;
-    }
-    
-    private void DomainNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
     private void ValuesListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
 
@@ -167,6 +166,21 @@ public partial class DomainForm : Form
         UpdateOkButtonAvailability();
     }
 
+    private void ValueTextBox_TextChanged(object sender, EventArgs e)
+    {
+        var isAnyValueSelected = IsAnyValueSelected();
+        var isValueValid = IsValueValid();
+
+        AddButton.Enabled = isValueValid;
+        EditButton.Enabled = isAnyValueSelected && isValueValid;
+    }
+
+    private void DomainNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
+
+    #endregion
+
+    #region Utility methods
+
     private void SetDomain(string name, List<DomainValue> values)
     {
         if (Domain is null)
@@ -187,23 +201,31 @@ public partial class DomainForm : Form
 
     private string GetValue() => ValueTextBox.Text.Trim();
 
+    private bool IsValueUsed(string value) => _values.Any(v => v.Value == value);
+
     private bool IsValueValid() => !string.IsNullOrWhiteSpace(GetValue());
 
     private bool IsAnyValueSelected() => ValuesListView.SelectedItems.Count > 0;
-
-    private bool IsValueAlreadyExists(string value) => _values.Any(v => v.Value == value);
 
     private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
 
     private bool IsDomainValueUsed(DomainValue domainValue) => _knowledgeBase.IsDomainValueUsed(domainValue);
 
-    private void InitializeComponents()
+    private void InitializeControls(Domain domain)
     {
-        DomainNameTextBox.Text = Domain!.Name;
+        DomainNameTextBox.Text = domain.Name;
 
-        foreach (var value in Domain.Values)
+        foreach (var value in domain.Values)
         {
             AddItemToListView(value);
+        }
+    }
+
+    private void CopyValues(Domain domain)
+    {
+        foreach (var value in domain.Values)
+        {
+            _values.Add(value);
         }
     }
 
@@ -217,11 +239,11 @@ public partial class DomainForm : Form
         item.Tag = domainValue;
     }
 
-    private void RemoveItemFromListView(ListViewItem item) => ValuesListView.Items.Remove(item);
-
     private void UpdateOkButtonAvailability() => OkButton.Enabled = IsNameValid() && IsAnyValueAdded();
 
     private void ResetValueTextBox() => ValueTextBox.Text = string.Empty;
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+    #endregion
 }

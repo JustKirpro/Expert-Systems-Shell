@@ -4,7 +4,7 @@ namespace ExpertSystemsShell;
 
 public class ExpertSystemShell
 {
-    public KnowledgeBase KnowledgeBase { get; } = new();
+    public KnowledgeBase KnowledgeBase { get; set; } = new();
 
     private readonly InferenceEngine _inferenceEngine = new();
 

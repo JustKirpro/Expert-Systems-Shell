@@ -35,7 +35,7 @@
             this.DomainComboBox = new System.Windows.Forms.ComboBox();
             this.TypeGroupBox = new System.Windows.Forms.GroupBox();
             this.InferredOption = new System.Windows.Forms.RadioButton();
-            this.RequestedInferredOption = new System.Windows.Forms.RadioButton();
+            this.InferredRequestedOption = new System.Windows.Forms.RadioButton();
             this.RequestedOption = new System.Windows.Forms.RadioButton();
             this.QuestionGroupBox = new System.Windows.Forms.GroupBox();
             this.QuestionTextBox = new System.Windows.Forms.TextBox();
@@ -99,7 +99,7 @@
             // TypeGroupBox
             // 
             this.TypeGroupBox.Controls.Add(this.InferredOption);
-            this.TypeGroupBox.Controls.Add(this.RequestedInferredOption);
+            this.TypeGroupBox.Controls.Add(this.InferredRequestedOption);
             this.TypeGroupBox.Controls.Add(this.RequestedOption);
             this.TypeGroupBox.Location = new System.Drawing.Point(12, 200);
             this.TypeGroupBox.Name = "TypeGroupBox";
@@ -120,17 +120,17 @@
             this.InferredOption.UseVisualStyleBackColor = true;
             this.InferredOption.CheckedChanged += new System.EventHandler(this.InferredOption_CheckedChanged);
             // 
-            // RequestedInferredOption
+            // InferredRequestedOption
             // 
-            this.RequestedInferredOption.AutoSize = true;
-            this.RequestedInferredOption.Location = new System.Drawing.Point(6, 122);
-            this.RequestedInferredOption.Name = "RequestedInferredOption";
-            this.RequestedInferredOption.Size = new System.Drawing.Size(347, 36);
-            this.RequestedInferredOption.TabIndex = 1;
-            this.RequestedInferredOption.TabStop = true;
-            this.RequestedInferredOption.Text = "Запрашиваемо-выводимая";
-            this.RequestedInferredOption.UseVisualStyleBackColor = true;
-            this.RequestedInferredOption.CheckedChanged += new System.EventHandler(this.RequestedInferredOption_CheckedChanged);
+            this.InferredRequestedOption.AutoSize = true;
+            this.InferredRequestedOption.Location = new System.Drawing.Point(6, 122);
+            this.InferredRequestedOption.Name = "InferredRequestedOption";
+            this.InferredRequestedOption.Size = new System.Drawing.Size(346, 36);
+            this.InferredRequestedOption.TabIndex = 1;
+            this.InferredRequestedOption.TabStop = true;
+            this.InferredRequestedOption.Text = "Выводимо-запрашиваемая";
+            this.InferredRequestedOption.UseVisualStyleBackColor = true;
+            this.InferredRequestedOption.CheckedChanged += new System.EventHandler(this.RequestedInferredOption_CheckedChanged);
             // 
             // RequestedOption
             // 
@@ -219,7 +219,7 @@
         private System.Windows.Forms.ComboBox DomainComboBox;
         private System.Windows.Forms.GroupBox TypeGroupBox;
         private System.Windows.Forms.RadioButton InferredOption;
-        private System.Windows.Forms.RadioButton RequestedInferredOption;
+        private System.Windows.Forms.RadioButton InferredRequestedOption;
         private System.Windows.Forms.RadioButton RequestedOption;
         private System.Windows.Forms.GroupBox QuestionGroupBox;
         private System.Windows.Forms.TextBox QuestionTextBox;

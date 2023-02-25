@@ -17,7 +17,7 @@ namespace ExpertSystemsShell.Forms
             InitializeComponent();
 
             _knowledgeBase = knowledgeBase;
-            _inferenceEngine = new(knowledgeBase);
+            //_inferenceEngine = new(knowledgeBase);
 
             SetGoalVariables();
             Write("Выберите цель консультации");

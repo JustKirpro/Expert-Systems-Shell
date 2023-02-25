@@ -19,6 +19,8 @@ public partial class FactForm : Form
 
     public Fact? Fact { get; private set; }
 
+    #region Constructors
+
     public FactForm(KnowledgeBase knowledgeBase, List<string> usedVariables, bool isRequested)
     {
         InitializeComponent();
@@ -29,7 +31,7 @@ public partial class FactForm : Form
         _usedVariables = usedVariables;
         _isRequested = isRequested;
 
-        InitializeVariableComboBox();
+        InitializeVariableComboBox(knowledgeBase);
     }
 
     public FactForm(KnowledgeBase knowledgeBase, List<string> usedVariables, Fact fact, bool isRequested)
@@ -42,8 +44,12 @@ public partial class FactForm : Form
         _isRequested = isRequested;
         Fact = fact;
 
-        InitializeComponents();
+        InitializeComponents(knowledgeBase, fact);
     }
+
+    #endregion
+
+    #region Events
 
     private void OkButton_Click(object sender, EventArgs e)
     {
@@ -95,6 +101,10 @@ public partial class FactForm : Form
 
     private void ValueComboBox_SelectedIndexChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
+    #endregion
+
+    #region Utility methods
+
     private void SetFact(Variable variable, DomainValue value)
     {
         if (Fact is null)
@@ -125,22 +135,22 @@ public partial class FactForm : Form
     
     private bool IsVariableAvailable(Variable variable)
     {
-        return (IsVariableRequestedInferred() || IsVariableRequested() && _isRequested || IsVariableInferred() && !_isRequested) && !IsVariableUsed(variable);
+        return (IsVariableInferredRequested() || IsVariableRequested() && _isRequested || IsVariableInferred() && !_isRequested) && !IsVariableUsed(variable);
         
-        bool IsVariableRequestedInferred() => variable.Type is VariableType.RequestedInferred;
+        bool IsVariableInferredRequested() => variable.Type is VariableType.InferredRequested;
         bool IsVariableRequested() => variable.Type is VariableType.Requested;
         bool IsVariableInferred() => variable.Type is VariableType.Inferred;
     }
 
-    private void InitializeComponents()
+    private void InitializeComponents(KnowledgeBase knowledgeBase, Fact fact)
     {
-        InitializeVariableComboBox();
-        InitializeValueComboBox();
+        InitializeVariableComboBox(knowledgeBase);
+        InitializeValueComboBox(fact);
     }
 
-    private void InitializeVariableComboBox()
+    private void InitializeVariableComboBox(KnowledgeBase knowledgeBase)
     {
-        var variables = _knowledgeBase.Variables;
+        var variables = knowledgeBase.Variables;
 
         foreach (var variable in variables.Where(IsVariableAvailable))
         {
@@ -153,9 +163,9 @@ public partial class FactForm : Form
         }
     }
 
-    private void InitializeValueComboBox()
+    private void InitializeValueComboBox(Fact fact)
     {
-        var values = Fact!.Variable.Domain.Values;
+        var values = fact.Variable.Domain.Values;
 
         ValueComboBox.Items.Clear();
 
@@ -163,7 +173,7 @@ public partial class FactForm : Form
         {
             ValueComboBox.Items.Add(value.Value);
 
-            if (value == Fact.Value)
+            if (value == fact.Value)
             {
                 ValueComboBox.SelectedItem = value.Value;
             }
@@ -196,4 +206,6 @@ public partial class FactForm : Form
     private bool IsAnyValueSelected() => ValueComboBox.SelectedIndex > -1;
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+    #endregion
 }

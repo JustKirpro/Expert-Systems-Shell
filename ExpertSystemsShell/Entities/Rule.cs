@@ -17,7 +17,12 @@ public class Rule
     { 
         get
         {
-            var stringBuilder = new StringBuilder("ЕСЛИ ");
+            var stringBuilder = new StringBuilder();
+
+            if (ConditionPart.Count > 0)
+            {
+                stringBuilder.Append("ЕСЛИ ");
+            }
 
             for (var i = 0; i < ConditionPart.Count; i++)
             {
@@ -29,7 +34,10 @@ public class Rule
                 }
             }
 
-            stringBuilder.Append(" ТО ");
+            if (ConditionPart.Count > 0)
+            {
+                stringBuilder.Append(" ТО ");
+            }    
 
             for (var i = 0; i < ActionPart.Count; i++)
             {

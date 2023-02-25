@@ -13,17 +13,19 @@ public partial class VariableForm : Form
 
     public Variable? Variable { get; private set; }
 
+    #region Constructors
+
     public VariableForm(KnowledgeBase knowledgeBase)
     {
         InitializeComponent();
         Text = "Создание переменной";
         OkButton.Enabled = false;
         RequestedOption.Checked = true;
-        VariableNameTextBox.Text = $"Variable{knowledgeBase.Variables.Count + 1}";
+        VariableNameTextBox.Text = knowledgeBase.GetNextVariableName();
 
         _knowledgeBase = knowledgeBase;
 
-        InitializeDomainsComboBox();
+        InitializeDomainsComboBox(knowledgeBase);
     }
 
     public VariableForm(KnowledgeBase knowledgeBase, Variable variable)
@@ -34,8 +36,12 @@ public partial class VariableForm : Form
         _knowledgeBase = knowledgeBase;
         Variable = variable;
 
-        InitializeComponents();
+                InitializeControls(knowledgeBase, variable);
     }
+
+    #endregion
+
+    #region Button events
 
     private void OkButton_Click(object sender, EventArgs e)
     {
@@ -51,10 +57,13 @@ public partial class VariableForm : Form
 
         if (IsQuestionSkipped(question) && !IsDefaultQuestion(name))
         {
-            return;
+            question = string.Empty;
+        }
+        else
+        {
+            question = GetFinalQuestion(question);
         }
 
-        question = GetFinalQuestion(question);
         var domain = GetDomain();
         var variableType = GetVariableType();
 
@@ -76,15 +85,19 @@ public partial class VariableForm : Form
         }
     }
 
+    #endregion
+
+    #region TextBoxes, RadioButtons and ComboBox events
+
     private void VariableNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
     private void QuestionTextBox_TextChanged(object sender, EventArgs e)
     {
         var question = GetQuestion();
 
-        if (!string.IsNullOrWhiteSpace(question))
+        if (IsQuestionValid(question))
         {
-            _questionText = QuestionTextBox.Text.Trim();
+            _questionText = question;
         }
     }
 
@@ -95,6 +108,10 @@ public partial class VariableForm : Form
     private void InferredOption_CheckedChanged(object sender, EventArgs e) => UpdateRadioButtons();
 
     private void RequestedInferredOption_CheckedChanged(object sender, EventArgs e) => UpdateRadioButtons();
+
+    #endregion
+
+    #region Utility methods
 
     private void SetVariable(string name, string question, Domain domain, VariableType variableType)
     {
@@ -116,6 +133,8 @@ public partial class VariableForm : Form
 
     private string GetQuestion() => QuestionTextBox.Text.Trim();
 
+    private static bool IsQuestionValid(string question) => !string.IsNullOrWhiteSpace(question);
+
     private string GetFinalQuestion(string question)
     {
         var variableType = GetVariableType();
@@ -127,19 +146,14 @@ public partial class VariableForm : Form
 
         var name = GetName();
 
-        return string.IsNullOrWhiteSpace(question) ? $"{name}?" : question;
+        return IsQuestionValid(question) ? question : $"{name}?";
     }
 
-    private bool IsQuestionSkipped(string question) => IsQuestionAvailable() && string.IsNullOrWhiteSpace(question);
+    private bool IsQuestionSkipped(string question) => IsQuestionAvailable() && !IsQuestionValid(question);
 
-    private static bool IsDefaultQuestion(string name)
-    {
-        var result = MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: \"{name}?\"",
-            "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-        return result == DialogResult.Yes;
-    }
+    private bool IsQuestionAvailable() => RequestedOption.Checked || InferredRequestedOption.Checked;
 
-    private bool IsQuestionAvailable() => RequestedOption.Checked || RequestedInferredOption.Checked;
+    private static bool IsDefaultQuestion(string name) => MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: \"{name}?\"", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
 
     private Domain GetDomain()
     {
@@ -154,22 +168,22 @@ public partial class VariableForm : Form
             return VariableType.Requested;
         }
         
-        return InferredOption.Checked ? VariableType.Inferred : VariableType.RequestedInferred;
+        return InferredOption.Checked ? VariableType.Inferred : VariableType.InferredRequested;
     }
 
-    private void InitializeComponents()
+    private void InitializeControls(KnowledgeBase knowledgeBase, Variable variable)
     {
-        VariableNameTextBox.Text = Variable!.Name;
+        VariableNameTextBox.Text = variable.Name;
 
-        InitializeDomainsComboBox();
-        InitializeRadioButtons();
+        InitializeDomainsComboBox(knowledgeBase);
+        InitializeRadioButtons(variable);
 
-        QuestionTextBox.Text = Variable.Question;
+        QuestionTextBox.Text = variable.Question;
     }
 
-    private void InitializeDomainsComboBox()
+    private void InitializeDomainsComboBox(KnowledgeBase knowledgeBase)
     {
-        var domains = _knowledgeBase.Domains;
+        var domains = knowledgeBase.Domains;
 
         foreach (var domain in domains)
         {
@@ -182,9 +196,9 @@ public partial class VariableForm : Form
         }
     }
 
-    private void InitializeRadioButtons()
+    private void InitializeRadioButtons(Variable variable)
     {
-        switch (Variable!.Type)
+        switch (variable.Type)
         {
             case VariableType.Requested:
                 RequestedOption.Checked = true;
@@ -192,8 +206,8 @@ public partial class VariableForm : Form
             case VariableType.Inferred:
                 InferredOption.Checked = true;
                 return;
-            case VariableType.RequestedInferred:
-                RequestedInferredOption.Checked = true;
+            case VariableType.InferredRequested:
+                InferredRequestedOption.Checked = true;
                 return;
         }
     }
@@ -223,4 +237,6 @@ public partial class VariableForm : Form
     }
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+    #endregion
 }

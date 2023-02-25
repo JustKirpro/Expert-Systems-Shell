@@ -14,7 +14,7 @@ public class Variable
     {
         VariableType.Requested => "Запрашимаемая",
         VariableType.Inferred => "Выводимая",
-        VariableType.RequestedInferred => "Запрашиваемо-выводимая",
+        VariableType.InferredRequested => "Выводимо-запрашиваемая",
         _ => "Неизвестный",
     };
 

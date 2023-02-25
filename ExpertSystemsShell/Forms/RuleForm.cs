@@ -18,12 +18,14 @@ public partial class RuleForm : Form
 
     public Rule? Rule { get; private set; }
 
+    #region Constructors
+
     public RuleForm(KnowledgeBase knowledgeBase)
     {
         InitializeComponent();
         Text = "Создание правила";
         OkButton.Enabled = false;
-        RuleNameTextBox.Text = $"R{knowledgeBase.Rules.Count + 1}";
+        RuleNameTextBox.Text = knowledgeBase.GetNextRuleName();
 
         _knowledgeBase = knowledgeBase;
     }
@@ -31,14 +33,17 @@ public partial class RuleForm : Form
     public RuleForm(KnowledgeBase knowledgeBase, Rule rule)
     {
         InitializeComponent();
+        CopyParts(rule.ConditionPart, rule.ActionPart);
+        InitializeControls(rule);
         Text = "Редактирование правила";
 
         _knowledgeBase= knowledgeBase;
-        InitializeParts(rule.ConditionPart, rule.ActionPart);
         Rule = rule;
-
-        InitializeComponents();
     }
+
+    #endregion
+
+    #region Button events
 
     private void OkButton_Click(object sender, EventArgs e)
     {
@@ -115,12 +120,6 @@ public partial class RuleForm : Form
         UpdateOkButtonAvailability();
     }
 
-    private void ConditionPartListView_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        var isAnyFactSelected = ConditionPartListView.SelectedItems.Count > 0;
-        ConditionPartEditButton.Enabled = ConditionPartDeleteButton.Enabled = isAnyFactSelected;
-    }
-
     private void ActionPartAddButton_Click(object sender, EventArgs e)
     {
         var usedVariables = GetActionPartUsedVariables();
@@ -174,6 +173,16 @@ public partial class RuleForm : Form
         UpdateOkButtonAvailability();
     }
 
+    #endregion
+
+    #region ListViews and TextBox events
+
+    private void ConditionPartListView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var isAnyFactSelected = ConditionPartListView.SelectedItems.Count > 0;
+        ConditionPartEditButton.Enabled = ConditionPartDeleteButton.Enabled = isAnyFactSelected;
+    }
+
     private void ActionPartListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var isAnyFactSelected = ActionPartListView.SelectedItems.Count > 0;
@@ -181,6 +190,10 @@ public partial class RuleForm : Form
     }
 
     private void RuleNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
+
+    #endregion
+
+    #region Utility methods
 
     private void SetRule(string name, string reason, List<Fact> conditionPart, List<Fact> actionPart)
     {
@@ -196,7 +209,7 @@ public partial class RuleForm : Form
         Rule.ActionPart = actionPart;
     }
 
-    private void InitializeParts(IEnumerable<Fact> conditionPart, IEnumerable<Fact> actionPart)
+    private void CopyParts(IEnumerable<Fact> conditionPart, IEnumerable<Fact> actionPart)
     {
         foreach (var newFact in conditionPart.Select(fact => new Fact(fact.Variable, fact.Value)))
         {
@@ -217,6 +230,11 @@ public partial class RuleForm : Form
 
     private bool IsConditionPartUnique(List<Fact> conditionPart)
     {
+        if (conditionPart.Count == 0)
+        {
+            return true;
+        }
+
         foreach (var rule in _knowledgeBase.Rules)
         {
             if (!IsFactsNumberMatched(rule, conditionPart))
@@ -243,10 +261,10 @@ public partial class RuleForm : Form
 
     private List<string> GetActionPartUsedVariables() => _actionPart.Select(v => v.Variable.Name).ToList();
 
-    private void InitializeComponents()
+    private void InitializeControls(Rule rule)
     {
-        RuleNameTextBox.Text = Rule!.Name;
-        ReasonTextBox.Text = Rule.Reason;
+        RuleNameTextBox.Text = rule.Name;
+        ReasonTextBox.Text = rule.Reason;
 
         InitializeConditionPartListView();
         InitializeActionPartListView();
@@ -271,7 +289,7 @@ public partial class RuleForm : Form
     private void UpdateOkButtonAvailability()
     {
         var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && ConditionPartListView.Items.Count > 0 && ActionPartListView.Items.Count > 0;
+        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && ActionPartListView.Items.Count > 0;
     }
 
     private static void AddItemToListView(ListView listView, Fact fact)
@@ -283,4 +301,6 @@ public partial class RuleForm : Form
     private static ListViewItem GetSelectedItem(ListView listView) => listView.SelectedItems[0];
     
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+    #endregion
 }
