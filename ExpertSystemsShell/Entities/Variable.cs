@@ -1,4 +1,6 @@
-﻿namespace ExpertSystemsShell.Entities;
+﻿using Newtonsoft.Json;
+
+namespace ExpertSystemsShell.Entities;
 
 public class Variable
 {
@@ -10,6 +12,7 @@ public class Variable
 
     public VariableType Type { get; set; }
 
+    [JsonIgnore]
     public string FormattedType => Type switch
     {
         VariableType.Requested => "Запрашимаемая",

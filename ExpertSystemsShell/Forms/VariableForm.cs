@@ -194,6 +194,12 @@ public partial class VariableForm : Form
                 DomainComboBox.SelectedItem = domain.Name;
             }
         }
+
+        if (domains.Count > 0 && DomainComboBox.SelectedIndex < 0) 
+        {
+            DomainComboBox.SelectedItem = domains[0].Name;
+            DomainComboBox.SelectedIndex = 0;
+        }
     }
 
     private void InitializeRadioButtons(Variable variable)

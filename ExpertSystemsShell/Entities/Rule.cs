@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace ExpertSystemsShell.Entities;
 
@@ -13,6 +14,7 @@ public class Rule
     
     public List<Fact> ActionPart { get; set; }
 
+    [JsonIgnore]
     public string FormattedRule 
     { 
         get

@@ -3,10 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using ExpertSystemsShell.Entities;
-using ExpertSystemsShell.Components;
-using System.Threading.Tasks;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -17,7 +14,7 @@ public partial class MainForm : Form
     public MainForm()
     {
         InitializeComponent();
-        //PopulateLists();
+        PopulateLists();
         InitializeListViews();
     }
 
@@ -25,13 +22,11 @@ public partial class MainForm : Form
 
     private void MenuFileNew_Click(object sender, EventArgs e)
     {
-        //_expertSystemShell = new();
-        var path = @"C:\Users\Justk\Desktop\poof.json";
-        var m = JsonConvert.SerializeObject(_expertSystemShell.KnowledgeBase, Formatting.Indented);
-        File.WriteAllText(path, m);
+        Text = "Новая экспертная система";
+        _expertSystemShell = new();
+        RefreshListViews();
     }
 
-    // Async void
     private async void MenuFileOpen_Click(object sender, EventArgs e)
     {
         using var openFileDialog = new OpenFileDialog()
@@ -45,22 +40,16 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var path = openFileDialog.FileName;
-            var json = await File.ReadAllTextAsync(path);
-            var knowledgeBase = JsonConvert.DeserializeObject<KnowledgeBase>(json,
-                new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.Objects });
-            _expertSystemShell.KnowledgeBase = knowledgeBase!;
+            await _expertSystemShell.LoadKnowledgeBase(path);
 
-            DisplayRules();
-            DisplayVariables();
-            DisplayDomains();
+            Text = Path.GetFileNameWithoutExtension(path);
+            RefreshListViews();
         }
     }
 
     private void MenuFileSave_Click(object sender, EventArgs e)
     {
-        var path = @"C:\Users\Justk\Desktop\poof.json";
-        var m = JsonConvert.SerializeObject(_expertSystemShell.KnowledgeBase);
-        File.WriteAllText(path, m); 
+
     }
 
     private async void MenuFileSaveAs_Click(object sender, EventArgs e)
@@ -76,9 +65,7 @@ public partial class MainForm : Form
         if (result == DialogResult.OK)
         {
             var path = saveFileDialog.FileName;
-            var json = JsonConvert.SerializeObject(_expertSystemShell.KnowledgeBase, Formatting.Indented,
-                new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.Objects });
-            await File.WriteAllTextAsync(path, json);
+            await _expertSystemShell.SaveKnowledgeBase(path);
         }
     }
 
@@ -98,19 +85,13 @@ public partial class MainForm : Form
 
     private void MenuConsultationStart_Click(object sender, EventArgs e)
     {
-        var knowledgeBase = _expertSystemShell.KnowledgeBase;
-        var consultationForms = new ConsultationForm(knowledgeBase);
-        var result = consultationForms.ShowDialog();
-
-        if (result == DialogResult.OK)
-        {
-
-        }
+        var consultationForms = new ConsultationForm(_expertSystemShell);
+        consultationForms.ShowDialog();
     }
 
     private void MenuConsultationExplain_Click(object sender, EventArgs e)
     {
-        //_expertSystemShell.
+     
     }
 
     #endregion
@@ -594,6 +575,7 @@ public partial class MainForm : Form
         var time = new Domain("Длительности прогулок", new List<DomainValue>() { lessThanHour, lessThanTwoHours, moreThanTwoHours });
         knowledgeBase.Domains.Add(time);
 
+        /*
         var breed = new Variable("Порода", string.Empty, breedDomain, VariableType.Inferred);
         knowledgeBase.Variables.Add(breed);
 
@@ -615,7 +597,8 @@ public partial class MainForm : Form
         var veter = new Variable("Ветеринарные клиники", "Есть ли поблизости ветеринарные клиники?", noYes, VariableType.Requested);
         var sze = new Variable("Размер", "Собаку какого размера вы хотите?", size, VariableType.Requested);
         knowledgeBase.Variables.AddRange(new[] { exters, grooming, heathRisk, drool, climate, veter, sze });
-
+        
+        */
         var readiness = new Variable("Готовность стать хозяином", string.Empty, lowMediumHigh1, VariableType.Inferred);
         var expirience = new Variable("Опыт владения собаками", "Есть ли у вас опыт владения собаками?", noYes, VariableType.Requested);
         var closeness = new Variable("Близость с собакой", string.Empty, lowMediumHigh1, VariableType.Inferred);
@@ -630,6 +613,8 @@ public partial class MainForm : Form
         var house = new Variable("Частный дом", "Живёте ли в частном доме?", noYes, VariableType.Requested);
         knowledgeBase.Variables.AddRange(new[] { readiness, expirience, closeness, atention, missOften, train, walks, activity, walkDur, walkTemp, dacha, house });
 
+        
+        /*
         #region Breed
         var r1 = new Rule("R1", "Темперамент сангвиник, благоприятные внешние факторы, средний размер => Мопсик",
             new List<Fact>(new[] { new Fact(temp, sanguine), new Fact(exters, favorable), new Fact(sze, medium3) }),
@@ -769,55 +754,55 @@ public partial class MainForm : Form
 
         #region Temeprament
 
-        var r39 = new Rule("R39", "Опасность для здоровья низкая, собака должна быть защитником, приемлемый уровень шума средний => Холерик",
-            new List<Fact>(new[] { new Fact(heathRisk, low1), new(defender, yes), new(noise, medium2) }),
+        var r39 = new Rule("R39", "Опасность низкая, собака должна быть защитником, приемлемый уровень шума средний => Холерик",
+            new List<Fact>(new[] { new Fact(danger, low1), new(defender, yes), new(noise, medium2) }),
             new List<Fact>(new[] { new Fact(temp, choleric) }));
-        var r40 = new Rule("R40", "Опасность для здоровья низкая, собака должна быть защитником, приемлемый уровень шума высокий => Холерик",
-            new List<Fact>(new[] { new Fact(heathRisk, low1), new(defender, yes), new(noise, high2) }),
+        var r40 = new Rule("R40", "Опасность низкая, собака должна быть защитником, приемлемый уровень шума высокий => Холерик",
+            new List<Fact>(new[] { new Fact(danger, low1), new(defender, yes), new(noise, high2) }),
             new List<Fact>(new[] { new Fact(temp, choleric) }));
-        var r41 = new Rule("R41", "Опасность для здоровья средняя, собака должна быть защитником, приемлемый уровень шума средний => Холерик",
-           new List<Fact>(new[] { new Fact(heathRisk, medium1), new(defender, yes), new(noise, medium2) }),
+        var r41 = new Rule("R41", "Опасность средняя, собака должна быть защитником, приемлемый уровень шума средний => Холерик",
+           new List<Fact>(new[] { new Fact(danger, medium1), new(defender, yes), new(noise, medium2) }),
            new List<Fact>(new[] { new Fact(temp, choleric) }));
-        var r42 = new Rule("R42", "Опасность для здоровья средняя, собака должна быть защитником, приемлемый уровень шума высокий => Холерик",
-            new List<Fact>(new[] { new Fact(heathRisk, medium1), new(defender, yes), new(noise, high2) }),
+        var r42 = new Rule("R42", "Опасность средняя, собака должна быть защитником, приемлемый уровень шума высокий => Холерик",
+            new List<Fact>(new[] { new Fact(danger, medium1), new(defender, yes), new(noise, high2) }),
             new List<Fact>(new[] { new Fact(temp, choleric) }));
         knowledgeBase.Rules.AddRange(new[] { r39, r40, r41, r42 });
 
-        var r43 = new Rule("R43", "Опасность для здоровья низкая, собака не должна быть защитником, приемлемый уровень шума средний => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, low1), new(defender, no), new(noise, medium2) }),
+        var r43 = new Rule("R43", "Опасность низкая, собака не должна быть защитником, приемлемый уровень шума средний => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, low1), new(defender, no), new(noise, medium2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
-        var r44 = new Rule("R44", "Опасность для здоровья низкая, собака не должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, low1), new(defender, no), new(noise, high2) }),
+        var r44 = new Rule("R44", "Опасность низкая, собака не должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, low1), new(defender, no), new(noise, high2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
-        var r45 = new Rule("R45", "Опасность для здоровья средняя, собака не должна быть защитником, приемлемый уровень шума средний => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, medium1), new(defender, no), new(noise, medium2) }),
+        var r45 = new Rule("R45", "Опасность средняя, собака не должна быть защитником, приемлемый уровень шума средний => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, medium1), new(defender, no), new(noise, medium2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
-        var r46 = new Rule("R46", "Опасность для здоровья средняя, собака не должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, medium1), new(defender, no), new(noise, high2) }),
+        var r46 = new Rule("R46", "Опасность средняя, собака не должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, medium1), new(defender, no), new(noise, high2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
         knowledgeBase.Rules.AddRange(new[] { r43, r44, r45, r46 });
 
-        var r47 = new Rule("R47", "Опасность для здоровья высокая, собака должна быть защитником, приемлемый уровень шума средний => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, high1), new(defender, yes), new(noise, medium2) }),
+        var r47 = new Rule("R47", "Опасность высокая, собака должна быть защитником, приемлемый уровень шума средний => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, high1), new(defender, yes), new(noise, medium2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
-        var r48 = new Rule("R48", "Опасность для здоровья высокая, собака должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
-           new List<Fact>(new[] { new Fact(heathRisk, high1), new(defender, yes), new(noise, high2) }),
+        var r48 = new Rule("R48", "Опасность высокая, собака должна быть защитником, приемлемый уровень шума высокий => Сангвиник",
+           new List<Fact>(new[] { new Fact(danger, high1), new(defender, yes), new(noise, high2) }),
            new List<Fact>(new[] { new Fact(temp, sanguine) }));
         knowledgeBase.Rules.AddRange(new[] { r47, r48 });
 
         var r49 = new Rule("R49", "Собака должна быть защитником, приемлемый уровень шума низкий => Флегматик",
            new List<Fact>(new[] { new Fact(defender, yes), new(noise, low2) }),
            new List<Fact>(new[] { new Fact(temp, phlegmatic) }));
-        var r50 = new Rule("R50", "Опасность для здоровья низкая, собака не должна быть защитником, приемлемый уровень шума низкий => Флегматик",
-           new List<Fact>(new[] { new Fact(heathRisk, low1), new Fact(defender, no), new(noise, low2) }),
+        var r50 = new Rule("R50", "Опасность низкая, собака не должна быть защитником, приемлемый уровень шума низкий => Флегматик",
+           new List<Fact>(new[] { new Fact(danger, low1), new Fact(defender, no), new(noise, low2) }),
            new List<Fact>(new[] { new Fact(temp, phlegmatic) }));
         knowledgeBase.Rules.AddRange(new[] { r49, r50 });
 
-        var r51 = new Rule("R51", "Опасность для здоровья средняя, собака не должна быть защитником, приемлемый уровень шума низкий => Меланхолик",
-          new List<Fact>(new[] { new Fact(heathRisk, medium1), new Fact(defender, no), new(noise, low2) }),
+        var r51 = new Rule("R51", "Опасность средняя, собака не должна быть защитником, приемлемый уровень шума низкий => Меланхолик",
+          new List<Fact>(new[] { new Fact(danger, medium1), new Fact(defender, no), new(noise, low2) }),
           new List<Fact>(new[] { new Fact(temp, melancholic) }));
-        var r52 = new Rule("R52", "Опасность для здоровья высокая, собака не должна быть защитником => Меланхолик",
-          new List<Fact>(new[] { new Fact(heathRisk, high1), new Fact(defender, no) }),
+        var r52 = new Rule("R52", "Опасность высокая, собака не должна быть защитником => Меланхолик",
+          new List<Fact>(new[] { new Fact(danger, high1), new Fact(defender, no) }),
           new List<Fact>(new[] { new Fact(temp, melancholic) }));
         knowledgeBase.Rules.AddRange(new[] { r51, r52 });
 
@@ -909,6 +894,8 @@ public partial class MainForm : Form
             new List<Fact>(new[] { new Fact(drool, high2), new(veter, no) }),
             new List<Fact>(new[] { new Fact(heathRisk, high1) }));
         knowledgeBase.Rules.AddRange(new[] { r69, r70, r71, r72, r73, r74, r75, r76, r77 });
+
+        */
 
         var r78 = new Rule("R78", "Нет опыта владения собаками и низкая близость => Низкая",
             new List<Fact>(new[] { new Fact(expirience, no), new(closeness, low1) }),
@@ -1095,6 +1082,13 @@ public partial class MainForm : Form
     private static int GetSelectedIndex(ListView listView) => listView.SelectedIndices.Count > 0 ? listView.SelectedIndices[0] : -1;
 
     private static void ResizeListView(ListView listView) => listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
+    private void RefreshListViews()
+    {
+        DisplayRules();
+        DisplayVariables();
+        DisplayDomains();
+    }
 
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, @"Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 

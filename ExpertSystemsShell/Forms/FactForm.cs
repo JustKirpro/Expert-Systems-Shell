@@ -135,7 +135,7 @@ public partial class FactForm : Form
     
     private bool IsVariableAvailable(Variable variable)
     {
-        return (IsVariableInferredRequested() || IsVariableRequested() && _isRequested || IsVariableInferred() && !_isRequested) && !IsVariableUsed(variable);
+        return (IsVariableInferredRequested() || IsVariableRequested() && _isRequested || IsVariableInferred()) && !IsVariableUsed(variable);
         
         bool IsVariableInferredRequested() => variable.Type is VariableType.InferredRequested;
         bool IsVariableRequested() => variable.Type is VariableType.Requested;
@@ -161,6 +161,12 @@ public partial class FactForm : Form
                 VariableComboBox.SelectedItem = variable.Name;
             }
         }
+
+        if (variables.Count > 0 && VariableComboBox.SelectedIndex < 0)
+        {
+            VariableComboBox.SelectedItem = variables[0].Name;
+            VariableComboBox.SelectedIndex = 0;
+        }
     }
 
     private void InitializeValueComboBox(Fact fact)
@@ -183,7 +189,6 @@ public partial class FactForm : Form
     private void RefreshValues(Variable variable)
     {
         ValueComboBox.Items.Clear();
-        ValueComboBox.SelectedIndex = -1;
 
         var values = variable.Domain.Values;
 
@@ -191,6 +196,10 @@ public partial class FactForm : Form
         {
             ValueComboBox.Items.Add(value.Value);
         }
+
+        ValueComboBox.SelectedItem = values[0].Value;
+        ValueComboBox.SelectedIndex = 0;
+
     }
 
     private void AddVariableToComboBox(Variable variable)

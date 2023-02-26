@@ -33,7 +33,7 @@ public class KnowledgeBase
 
     public List<Variable> GetVariablesByDomain(Domain domain) => Variables.Where(variable => variable.Domain == domain).ToList();
 
-    public List<Variable> GetGoalVariables() => Variables.Where(varible => varible.Type is VariableType.Inferred or VariableType.InferredRequested).ToList();
+    public List<Variable> GetGoalVariables() => Variables.Where(variable => variable.Type is VariableType.Inferred or VariableType.InferredRequested).ToList();
 
     public bool IsVariableUsed(Variable variable) => Rules.Any(rule => rule.ConditionPart.Concat(rule.ActionPart).Any(fact => fact.Variable == variable));
 

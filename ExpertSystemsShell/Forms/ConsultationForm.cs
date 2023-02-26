@@ -1,65 +1,76 @@
-﻿using ExpertSystemsShell.Components;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
-namespace ExpertSystemsShell.Forms
+namespace ExpertSystemsShell.Forms;
+
+public partial class ConsultationForm : Form
 {
-    public partial class ConsultationForm : Form
+    private readonly ExpertSystemShell _expertSystemShell;
+    
+    public ConsultationForm(ExpertSystemShell expertSystemShell)
     {
-        private readonly KnowledgeBase _knowledgeBase;
+        InitializeComponent();
 
-        private readonly InferenceEngine _inferenceEngine;
-
-        public WorkingMemory? WorkingMemory { get; set; }
-
-        public ConsultationForm(KnowledgeBase knowledgeBase)
-        {
-            InitializeComponent();
-
-            _knowledgeBase = knowledgeBase;
-            //_inferenceEngine = new(knowledgeBase);
-
-            SetGoalVariables();
-            Write("Выберите цель консультации");
-        }
-
-        private void AnswerButton_Click(object sender, EventArgs e)
-        {
-            if (_inferenceEngine.GoalVariabe is null)
-            {
-                var name = GetOption();
-                var variable = _knowledgeBase.GetVariableByName(name);
-                _inferenceEngine.GoalVariabe = variable;
-
-                SetOptions();
-            }
-        }
-
-        private void SetGoalVariables()
-        {
-            var variables = _knowledgeBase.GetGoalVariables();
-
-            foreach (var variable in variables)
-            {
-                OptionsComboBox.Items.Add(variable.Name);
-            }
-        }
-
-        private void SetOptions()
-        {
-            var variable = _inferenceEngine.GoalVariabe;
-            var options = variable!.Domain.Values;
-
-            OptionsComboBox.Items.Clear();
-
-            foreach (var option in options)
-            {
-                OptionsComboBox.Items.Add(option.Value);
-            }
-        }
-
-        private string GetOption() => OptionsComboBox.Text;
-
-        private void Write(string message) => ConsultationListBox.Items.Add(message);
+        _expertSystemShell = expertSystemShell;
+        SetOptions();
     }
+
+    private void SelectButton_Click(object sender, EventArgs e)
+    {
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var option = GetSelectedOption();
+        var variable = knowledgeBase.GetVariableByName(option);
+
+        var inferredVariable = _expertSystemShell.InferVariable(variable);
+
+        if (inferredVariable is null)
+        {
+            MessageBox.Show("Цель консультации не была достигнута. Обратитесь к другой ЭС", "Результаты", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        MessageBox.Show($"Цель консультации достигнута!\n {variable.Name} - {inferredVariable.Value.Value}", "Результаты", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        OptionGroupBox.Visible = false;
+        ButtonsGroupBox.Visible = true;
+    }
+
+    private void NewConsultationButton_Click(object sender, EventArgs e)
+    {
+        ButtonsGroupBox.Visible = false;
+        OptionGroupBox.Visible = true;
+    }
+
+    private void ShowExplanationButton_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("Not implemented yet!", "whoops", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+    }
+
+    private void OptionsComboBox_SelectedIndexChanged(object sender, EventArgs e) => SelectButton.Enabled = OptionsComboBox.SelectedIndex > -1;
+
+    private void ConsultationForm_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter && SelectButton.Enabled)
+        {
+            SelectButton.PerformClick();
+        }
+    }
+
+    private void SetOptions()
+    {
+        var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var goalVariables = knowledgeBase.GetGoalVariables();
+
+        foreach (var goalVariable in goalVariables)
+        {
+            OptionsComboBox.Items.Add(goalVariable.Name);
+        }
+
+        if (goalVariables.Count > 0)
+        {
+            OptionsComboBox.SelectedItem = goalVariables[0];
+            OptionsComboBox.SelectedIndex = 0;
+        }
+    }
+
+    private string GetSelectedOption() => OptionsComboBox.Text;
 }

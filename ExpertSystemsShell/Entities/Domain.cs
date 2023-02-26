@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace ExpertSystemsShell.Entities;
 
@@ -9,6 +10,7 @@ public class Domain
 
     public List<DomainValue> Values { get; set; }
 
+    [JsonIgnore]
     public string FormattedValues
     {
         get
