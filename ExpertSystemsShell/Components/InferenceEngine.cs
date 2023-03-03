@@ -9,14 +9,25 @@ public class InferenceEngine
 {
     private readonly KnowledgeBase _knowledgeBase;
 
-    public WorkingMemory WorkingMemory { get; } = new();
+    public WorkingMemory WorkingMemory { get; private set; } = null!;
 
     public InferenceEngine(KnowledgeBase knowledgeBase)
     {
         _knowledgeBase = knowledgeBase;
     }
 
-    public bool InferVariable(Variable variable)
+    /// <summary>
+    /// Infers variable value if it is possible.
+    /// </summary>
+    /// <param name="goalVariable"> Goal variable whose value needs to be inferred. </param>
+    /// <returns> true if variable value was inferred, false otherwise. </returns>
+    public bool InferGoalVariable(Variable goalVariable)
+    {
+        WorkingMemory = new WorkingMemory(goalVariable);
+        return InferVariable(WorkingMemory.GoalVariable);
+    }
+
+    private bool InferVariable(Variable variable)
     {
         var rules = _knowledgeBase.Rules.Where(r => r.ActionPart.Select(f => f.Variable).Contains(variable));
 
@@ -33,6 +44,7 @@ public class InferenceEngine
                     WorkingMemory.FiredRules.Add(rule);
                     return true;
                 case InferenceStatus.Canceled:
+                default:
                     return false;
             }
         }

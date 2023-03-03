@@ -6,7 +6,7 @@ namespace ExpertSystemsShell.Components;
 
 public class IoComponent
 {
-    private string _path = null!;
+    private string? _path;
 
     private readonly JsonSerializerSettings _settings = new()
     {
@@ -48,12 +48,19 @@ public class IoComponent
     }
 
     /// <summary>
-    /// Saves the knowledge base to a file at the saved path. Path is saved after using <see cref="SaveKnowledgeBase(KnowledgeBase, string)"> overloaded method </see>
+    /// Saves the knowledge base to a file at the saved path.
+    /// Path is saved after using <see cref="SaveKnowledgeBase(KnowledgeBase, string)"> overloaded method. </see>
+    /// If path was not set do nothing.
     /// </summary>
     /// <param name="knowledgeBase"> Knowledge base to be saved to a file. </param>
     /// <exception cref="IOException"></exception>
     public void SaveKnowledgeBase(KnowledgeBase knowledgeBase)
     {
+        if (_path is null)
+        {
+            return;
+        }
+        
         var formatter = new BinaryFormatter();
         using var stream = new FileStream(_path, FileMode.OpenOrCreate);
 
