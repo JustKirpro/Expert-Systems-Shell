@@ -64,7 +64,7 @@ public class IoComponent
         }
         catch
         {
-            throw new IOException("An error occurred during serialization");
+            throw new IOException("An error occurred while saving the knowledge base to a file");
         }
     }
 }
