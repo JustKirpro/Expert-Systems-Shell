@@ -140,7 +140,6 @@
             this.ValuesListView.AllowDrop = true;
             this.ValuesListView.FullRowSelect = true;
             this.ValuesListView.Location = new System.Drawing.Point(6, 38);
-            this.ValuesListView.MultiSelect = false;
             this.ValuesListView.Name = "ValuesListView";
             this.ValuesListView.Size = new System.Drawing.Size(723, 264);
             this.ValuesListView.TabIndex = 0;

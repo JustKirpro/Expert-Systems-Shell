@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using ExpertSystemsShell.Entities;
 using ExpertSystemsShell.Components;
+using ExpertSystemsShell.Entities;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -57,7 +57,7 @@ public partial class FactForm : Form
 
         if (IsVariableUsed(variable))
         {
-            ShowErrorMessageBox($"В правиле уже содержится факт с переменной \"{variable.Name}\"");
+            ShowErrorMessageBox($"В правиле уже содержится факт с переменной \"{variable.Name}\".");
             return;
         }
 
@@ -135,7 +135,7 @@ public partial class FactForm : Form
     
     private bool IsVariableAvailable(Variable variable)
     {
-        return (IsVariableInferredRequested() || IsVariableRequested() && _isRequested || IsVariableInferred()) && !IsVariableUsed(variable);
+        return ((IsVariableInferredRequested() || IsVariableInferred()) || IsVariableRequested() && _isRequested) && !IsVariableUsed(variable);
         
         bool IsVariableInferredRequested() => variable.Type is VariableType.InferredRequested;
         bool IsVariableRequested() => variable.Type is VariableType.Requested;
@@ -150,9 +150,9 @@ public partial class FactForm : Form
 
     private void InitializeVariableComboBox(KnowledgeBase knowledgeBase)
     {
-        var variables = knowledgeBase.Variables;
+        var variables = knowledgeBase.Variables.Where(IsVariableAvailable).ToList();
 
-        foreach (var variable in variables.Where(IsVariableAvailable))
+        foreach (var variable in variables)
         {
             VariableComboBox.Items.Add(variable.Name);
 
@@ -199,7 +199,6 @@ public partial class FactForm : Form
 
         ValueComboBox.SelectedItem = values[0].Value;
         ValueComboBox.SelectedIndex = 0;
-
     }
 
     private void AddVariableToComboBox(Variable variable)

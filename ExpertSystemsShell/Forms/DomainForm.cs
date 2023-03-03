@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
 using System.Windows.Forms;
-using ExpertSystemsShell.Entities;
 using ExpertSystemsShell.Components;
+using ExpertSystemsShell.Entities;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -23,7 +23,7 @@ public partial class DomainForm : Form
         InitializeComponent();
         Text = "Создание домена";
         OkButton.Enabled = false;
-        DomainNameTextBox.Text = knowledgeBase.GetNextDomainName();
+        DomainNameTextBox.Text = knowledgeBase.GenerateNextDomainName();
 
         _knowledgeBase = knowledgeBase;
     }
@@ -35,8 +35,9 @@ public partial class DomainForm : Form
         Text = "Редактирование домена";
 
         _knowledgeBase = knowledgeBase;
-        CopyValues(domain);
         Domain = domain;
+
+        CopyValues(domain);
     }
 
     #endregion
@@ -49,7 +50,7 @@ public partial class DomainForm : Form
 
         if (IsNameUsed(name))
         {
-            ShowErrorMessageBox($"Домен с именем \"{name}\" уже существует");
+            ShowErrorMessageBox($"Домен с именем \"{name}\" уже существует.");
             return;
         }
 
@@ -63,7 +64,7 @@ public partial class DomainForm : Form
 
         if (IsValueUsed(value))
         {
-            ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
+            ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене.");
             return;
         }
 
@@ -82,13 +83,13 @@ public partial class DomainForm : Form
 
         if (IsDomainValueUsed(domainValue))
         {
-            ShowErrorMessageBox("Данное значение домена используется, поэтому его нельзя изменить");
+            ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется, поэтому его нельзя изменить.");
             return;
         }
 
         var value = GetValue();
 
-        if (IsValueUsed(value) && domainValue.Value != value)
+        if (IsValueUsed(value) && value != domainValue.Value)
         {
             ShowErrorMessageBox($"Значение \"{value}\" уже есть в домене");
             return;
@@ -103,18 +104,21 @@ public partial class DomainForm : Form
 
     private void DeleteButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = GetSelectedItem();
-        var domainValue = (DomainValue)selectedItem.Tag;
-
-        if (IsDomainValueUsed(domainValue))
+        foreach (var row in ValuesListView.SelectedItems)
         {
-            ShowErrorMessageBox("Данное значение домена используется, поэтому его нельзя удалить");
-            return;
+            var item = (ListViewItem)row;
+            var domainValue = (DomainValue)item.Tag;
+
+            if (IsDomainValueUsed(domainValue))
+            {
+                ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется, поэтому его нельзя удалить.");
+                continue;
+            }
+
+            _values.Remove(domainValue);
+            ValuesListView.Items.Remove(item);
         }
 
-        _values.Remove(domainValue);
-
-        ValuesListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
     }
 
@@ -125,10 +129,9 @@ public partial class DomainForm : Form
     private void ValuesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var isAnyValueSelected = IsAnyValueSelected();
-        var isValueValid = IsValueValid();
 
         DeleteButton.Enabled = isAnyValueSelected;
-        EditButton.Enabled = isAnyValueSelected && isValueValid;
+        EditButton.Enabled = isAnyValueSelected && IsValueValid() && IsOnlyOneValueSelected();
     }
 
     private void ValuesListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
@@ -168,11 +171,10 @@ public partial class DomainForm : Form
 
     private void ValueTextBox_TextChanged(object sender, EventArgs e)
     {
-        var isAnyValueSelected = IsAnyValueSelected();
         var isValueValid = IsValueValid();
 
         AddButton.Enabled = isValueValid;
-        EditButton.Enabled = isAnyValueSelected && isValueValid;
+        EditButton.Enabled = isValueValid && IsAnyValueSelected();
     }
 
     private void DomainNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
@@ -206,6 +208,8 @@ public partial class DomainForm : Form
     private bool IsValueValid() => !string.IsNullOrWhiteSpace(GetValue());
 
     private bool IsAnyValueSelected() => ValuesListView.SelectedItems.Count > 0;
+
+    private bool IsOnlyOneValueSelected() => ValuesListView.SelectedItems.Count == 1;
 
     private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
 

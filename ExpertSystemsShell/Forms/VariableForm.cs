@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-using ExpertSystemsShell.Entities;
 using ExpertSystemsShell.Components;
+using ExpertSystemsShell.Entities;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -21,7 +21,7 @@ public partial class VariableForm : Form
         Text = "Создание переменной";
         OkButton.Enabled = false;
         RequestedOption.Checked = true;
-        VariableNameTextBox.Text = knowledgeBase.GetNextVariableName();
+        VariableNameTextBox.Text = knowledgeBase.GenerateNextVariableName();
 
         _knowledgeBase = knowledgeBase;
 
@@ -35,8 +35,8 @@ public partial class VariableForm : Form
 
         _knowledgeBase = knowledgeBase;
         Variable = variable;
-
-                InitializeControls(knowledgeBase, variable);
+        
+        InitializeControls(knowledgeBase, variable);
     }
 
     #endregion
@@ -49,19 +49,16 @@ public partial class VariableForm : Form
 
         if (IsNameUsed(name))
         {
-            ShowErrorMessageBox($"Переменная с именем \"{name}\" уже существует");
+            ShowErrorMessageBox($"Переменная с именем \"{name}\" уже существует.");
             return;
         }
 
         var question = GetQuestion();
 
-        if (IsQuestionSkipped(question) && !IsDefaultQuestion(name))
+        if (IsQuestionSkipped(question))
         {
-            question = string.Empty;
-        }
-        else
-        {
-            question = GetFinalQuestion(question);
+            question = IsDefaultQuestion(name) ? GetDefaultQuestion(name) : string.Empty;
+
         }
 
         var domain = GetDomain();
@@ -95,7 +92,7 @@ public partial class VariableForm : Form
     {
         var question = GetQuestion();
 
-        if (IsQuestionValid(question))
+        if (IsQuestionValid())
         {
             _questionText = question;
         }
@@ -129,31 +126,21 @@ public partial class VariableForm : Form
 
     private string GetName() => VariableNameTextBox.Text.Trim();
 
+    private bool IsNameValid() => !string.IsNullOrWhiteSpace(GetName());
+
     private bool IsNameUsed(string name) => _knowledgeBase.IsVariableNameUsed(name) && name != Variable?.Name;
 
     private string GetQuestion() => QuestionTextBox.Text.Trim();
 
-    private static bool IsQuestionValid(string question) => !string.IsNullOrWhiteSpace(question);
+    private bool IsQuestionValid() => !string.IsNullOrWhiteSpace(GetQuestion());
 
-    private string GetFinalQuestion(string question)
-    {
-        var variableType = GetVariableType();
+    private static string GetDefaultQuestion(string name) => $"{name}?";
 
-        if (variableType is VariableType.Inferred)
-        {
-            return string.Empty;
-        }
-
-        var name = GetName();
-
-        return IsQuestionValid(question) ? question : $"{name}?";
-    }
-
-    private bool IsQuestionSkipped(string question) => IsQuestionAvailable() && !IsQuestionValid(question);
+    private bool IsQuestionSkipped(string question) => IsQuestionAvailable() && !IsQuestionValid();
 
     private bool IsQuestionAvailable() => RequestedOption.Checked || InferredRequestedOption.Checked;
 
-    private static bool IsDefaultQuestion(string name) => MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: \"{name}?\"", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+    private static bool IsDefaultQuestion(string name) => MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: {GetDefaultQuestion(name)}", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
 
     private Domain GetDomain()
     {
@@ -174,11 +161,10 @@ public partial class VariableForm : Form
     private void InitializeControls(KnowledgeBase knowledgeBase, Variable variable)
     {
         VariableNameTextBox.Text = variable.Name;
+        QuestionTextBox.Text = variable.Question;
 
         InitializeDomainsComboBox(knowledgeBase);
         InitializeRadioButtons(variable);
-
-        QuestionTextBox.Text = variable.Question;
     }
 
     private void InitializeDomainsComboBox(KnowledgeBase knowledgeBase)
@@ -213,6 +199,7 @@ public partial class VariableForm : Form
                 InferredOption.Checked = true;
                 return;
             case VariableType.InferredRequested:
+            default:
                 InferredRequestedOption.Checked = true;
                 return;
         }
@@ -228,11 +215,7 @@ public partial class VariableForm : Form
 
     private void UpdateQuestionBoxAvailability() => QuestionTextBox.Enabled = !InferredOption.Checked;
 
-    private void UpdateOkButtonAvailability()
-    {
-        var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && IsDomainSelected();
-    }
+    private void UpdateOkButtonAvailability() => OkButton.Enabled = IsNameValid() && IsDomainSelected();
 
     private void UpdateRadioButtons()
     {

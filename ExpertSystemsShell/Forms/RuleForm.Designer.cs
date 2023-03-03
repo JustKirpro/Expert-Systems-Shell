@@ -85,14 +85,17 @@ namespace ExpertSystemsShell.Forms
             // 
             // ConditionPartListView
             // 
+            this.ConditionPartListView.AllowDrop = true;
             this.ConditionPartListView.Location = new System.Drawing.Point(6, 35);
-            this.ConditionPartListView.MultiSelect = false;
             this.ConditionPartListView.Name = "ConditionPartListView";
             this.ConditionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ConditionPartListView.TabIndex = 6;
             this.ConditionPartListView.UseCompatibleStateImageBehavior = false;
             this.ConditionPartListView.View = System.Windows.Forms.View.List;
+            this.ConditionPartListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ConditionPartListView_ItemDrag);
             this.ConditionPartListView.SelectedIndexChanged += new System.EventHandler(this.ConditionPartListView_SelectedIndexChanged);
+            this.ConditionPartListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ConditionPartListView_DragDrop);
+            this.ConditionPartListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.ConditionPartListView_DragEnter);
             // 
             // ConditionPartDeleteButton
             // 
@@ -180,7 +183,6 @@ namespace ExpertSystemsShell.Forms
             // ActionPartListView
             // 
             this.ActionPartListView.Location = new System.Drawing.Point(6, 35);
-            this.ActionPartListView.MultiSelect = false;
             this.ActionPartListView.Name = "ActionPartListView";
             this.ActionPartListView.Size = new System.Drawing.Size(434, 252);
             this.ActionPartListView.TabIndex = 7;

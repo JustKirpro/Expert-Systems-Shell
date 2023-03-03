@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using ExpertSystemsShell.Entities;
+using System.Drawing;
 using ExpertSystemsShell.Components;
+using ExpertSystemsShell.Entities;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -25,7 +26,7 @@ public partial class RuleForm : Form
         InitializeComponent();
         Text = "Создание правила";
         OkButton.Enabled = false;
-        RuleNameTextBox.Text = knowledgeBase.GetNextRuleName();
+        RuleNameTextBox.Text = knowledgeBase.GenerateNextRuleName();
 
         _knowledgeBase = knowledgeBase;
     }
@@ -33,12 +34,13 @@ public partial class RuleForm : Form
     public RuleForm(KnowledgeBase knowledgeBase, Rule rule)
     {
         InitializeComponent();
-        CopyParts(rule.ConditionPart, rule.ActionPart);
-        InitializeControls(rule);
         Text = "Редактирование правила";
 
         _knowledgeBase= knowledgeBase;
         Rule = rule;
+
+        CopyParts(rule.ConditionPart, rule.ActionPart);
+        InitializeControls(rule);
     }
 
     #endregion
@@ -51,13 +53,13 @@ public partial class RuleForm : Form
 
         if (IsNameUsed(name))
         {
-            ShowErrorMessageBox($"Правило с именем \"{name}\" уже существует");
+            ShowErrorMessageBox($"Правило с именем \"{name}\" уже существует.");
             return;
         }
 
         if (!IsConditionPartUnique(_conditionPart))
         {
-            ShowErrorMessageBox("Правило с такой посылкой уже существует");
+            ShowErrorMessageBox("Правило с такой посылкой уже существует.");
             return;
         }
 
@@ -69,7 +71,7 @@ public partial class RuleForm : Form
 
     private void ConditionPartAddButton_Click(object sender, EventArgs e)
     {
-        var usedVariables = GetConditionPartUsedVariables();
+        var usedVariables = GetUsedVariables();
 
         using var factForm = new FactForm(_knowledgeBase, usedVariables, true);
         var result = factForm.ShowDialog();
@@ -90,7 +92,7 @@ public partial class RuleForm : Form
         var selectedItem = GetSelectedItem(ConditionPartListView);
         var fact = (Fact)selectedItem.Tag;
 
-        var usedVariables = GetConditionPartUsedVariables();
+        var usedVariables = GetUsedVariables();
         usedVariables.Remove(fact.Variable.Name);
 
         using var factForm = new FactForm(_knowledgeBase, usedVariables, fact, true);
@@ -111,18 +113,21 @@ public partial class RuleForm : Form
 
     private void ConditionPartDeleteButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = GetSelectedItem(ConditionPartListView);
-        var fact = (Fact)selectedItem.Tag;
+        foreach (var row in ConditionPartListView.SelectedItems)
+        {
+            var item = (ListViewItem)row;
+            var fact = (Fact)item.Tag;
 
-        _conditionPart.Remove(fact);
+            _actionPart.Remove(fact);
+            ConditionPartListView.Items.Remove(item);
+        }
 
-        ConditionPartListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
     }
 
     private void ActionPartAddButton_Click(object sender, EventArgs e)
     {
-        var usedVariables = GetActionPartUsedVariables();
+        var usedVariables = GetUsedVariables();
 
         using var factForm = new FactForm(_knowledgeBase, usedVariables, false);
         var result = factForm.ShowDialog();
@@ -143,7 +148,7 @@ public partial class RuleForm : Form
         var selectedItem = GetSelectedItem(ActionPartListView);
         var fact = (Fact)selectedItem.Tag;
 
-        var usedVariables = GetActionPartUsedVariables();
+        var usedVariables = GetUsedVariables();
         usedVariables.Remove(fact.Variable.Name);
 
         using var factForm = new FactForm(_knowledgeBase, usedVariables, fact, false);
@@ -164,12 +169,15 @@ public partial class RuleForm : Form
 
     private void ActionPartDeleteButton_Click(object sender, EventArgs e)
     {
-        var selectedItem = GetSelectedItem(ActionPartListView);
-        var fact = (Fact)selectedItem.Tag;
+        foreach (var row in ActionPartListView.SelectedItems)
+        {
+            var item = (ListViewItem)row;
+            var fact = (Fact)item.Tag;
 
-        _actionPart.Remove(fact);
+            _actionPart.Remove(fact);
+            ActionPartListView.Items.Remove(item);
+        }
 
-        ActionPartListView.Items.Remove(selectedItem);
         UpdateOkButtonAvailability();
     }
 
@@ -179,14 +187,51 @@ public partial class RuleForm : Form
 
     private void ConditionPartListView_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var isAnyFactSelected = ConditionPartListView.SelectedItems.Count > 0;
-        ConditionPartEditButton.Enabled = ConditionPartDeleteButton.Enabled = isAnyFactSelected;
+        var selectedItemsNumber = ConditionPartListView.SelectedItems.Count;
+        ConditionPartEditButton.Enabled = selectedItemsNumber == 1;
+        ConditionPartDeleteButton.Enabled = selectedItemsNumber > 0;
+    }
+
+    private void ConditionPartListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
+
+    private void ConditionPartListView_DragEnter(object sender, DragEventArgs e) => e.Effect = DragDropEffects.Move;
+
+    private void ConditionPartListView_DragDrop(object sender, DragEventArgs e)
+    {
+        var startIndex = GetSelectedItemIndex(ConditionPartListView);
+
+        var point = ConditionPartListView.PointToClient(new Point(e.X, e.Y));
+        var item = ConditionPartListView.GetItemAt(point.X, point.Y);
+
+        if (item is null)
+        {
+            return;
+        }
+
+        var endIndex = item.Index;
+
+        if (startIndex == endIndex)
+        {
+            return;
+        }
+
+        item = ConditionPartListView.Items[startIndex];
+        var fact = (Fact)item.Tag;
+
+        _conditionPart.RemoveAt(startIndex);
+        _conditionPart.Insert(endIndex, fact);
+
+        ConditionPartListView.Items.RemoveAt(startIndex);
+        ConditionPartListView.Items.Insert(endIndex, item);
+
+        UpdateOkButtonAvailability();
     }
 
     private void ActionPartListView_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var isAnyFactSelected = ActionPartListView.SelectedItems.Count > 0;
-        ActionPartEditButton.Enabled = ActionPartDeleteButton.Enabled = isAnyFactSelected;
+        var selectedItemsNumber = ActionPartListView.SelectedItems.Count;
+        ActionPartEditButton.Enabled = selectedItemsNumber == 1;
+        ActionPartDeleteButton.Enabled = selectedItemsNumber > 0;
     }
 
     private void RuleNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
@@ -224,17 +269,14 @@ public partial class RuleForm : Form
 
     private string GetName() => RuleNameTextBox.Text.Trim();
 
-    private bool IsNameUsed(string name) => _knowledgeBase.Rules.Any(r => r.Name == name) && name != Rule?.Name;
+    private bool IsNameValid() => !string.IsNullOrWhiteSpace(GetName());
+
+    private bool IsNameUsed(string name) => _knowledgeBase.IsRuleNameUsed(name) && name != Rule?.Name;
 
     private string GetReason() => ReasonTextBox.Text.Trim();
 
     private bool IsConditionPartUnique(List<Fact> conditionPart)
     {
-        if (conditionPart.Count == 0)
-        {
-            return true;
-        }
-
         foreach (var rule in _knowledgeBase.Rules)
         {
             if (!IsFactsNumberMatched(rule, conditionPart))
@@ -242,11 +284,9 @@ public partial class RuleForm : Form
                 continue;
             }
 
-            var isConditionPartMatched = conditionPart
-                .Select(nf => rule.ConditionPart.Any(f => nf.Variable == f.Variable && nf.Value == f.Value))
-                .All(isFactExisted => isFactExisted);
+            var isConditionPartMatched = conditionPart.Select(nf => rule.ConditionPart.Any(f => nf.Variable == f.Variable && nf.Value == f.Value)).All(f => f);
             
-            if (isConditionPartMatched)
+            if (isConditionPartMatched && rule != Rule)
             {
                 return false;
             }
@@ -257,40 +297,28 @@ public partial class RuleForm : Form
 
     private static bool IsFactsNumberMatched(Rule rule, ICollection conditionPart) => conditionPart.Count == rule.ConditionPart.Count;
 
-    private List<string> GetConditionPartUsedVariables() => _conditionPart.Select(v => v.Variable.Name).ToList();
-
-    private List<string> GetActionPartUsedVariables() => _actionPart.Select(v => v.Variable.Name).ToList();
+    private List<string> GetUsedVariables() => _conditionPart.Union(_actionPart).Select(v => v.Variable.Name).ToList();
 
     private void InitializeControls(Rule rule)
     {
         RuleNameTextBox.Text = rule.Name;
         ReasonTextBox.Text = rule.Reason;
 
-        InitializeConditionPartListView();
-        InitializeActionPartListView();
+        InitializeListView(_conditionPart, ConditionPartListView);
+        InitializeListView(_actionPart, ActionPartListView);
     }
 
-    private void InitializeConditionPartListView()
+    private static void InitializeListView(List<Fact> part, ListView listView)
     {
-        foreach (var fact in _conditionPart)
+        foreach (var fact in part)
         {
-            AddItemToListView(ConditionPartListView, fact);
+            AddItemToListView(listView, fact);
         }
     }
 
-    private void InitializeActionPartListView()
-    {
-        foreach (var fact in _actionPart)
-        {
-            AddItemToListView(ActionPartListView, fact);
-        }
-    }
+    private static int GetSelectedItemIndex(ListView listView) => listView.SelectedIndices[0];
 
-    private void UpdateOkButtonAvailability()
-    {
-        var name = GetName();
-        OkButton.Enabled = !string.IsNullOrWhiteSpace(name) && ActionPartListView.Items.Count > 0;
-    }
+    private void UpdateOkButtonAvailability() => OkButton.Enabled = IsNameValid() && ActionPartListView.Items.Count > 0;
 
     private static void AddItemToListView(ListView listView, Fact fact)
     {
@@ -299,7 +327,7 @@ public partial class RuleForm : Form
     }
 
     private static ListViewItem GetSelectedItem(ListView listView) => listView.SelectedItems[0];
-    
+
     private static void ShowErrorMessageBox(string message) => MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
     #endregion
