@@ -6,7 +6,7 @@ namespace ExpertSystemsShell.Forms;
 public partial class ConsultationForm : Form
 {
     private readonly ExpertSystemShell _expertSystemShell;
-    
+
     public ConsultationForm(ExpertSystemShell expertSystemShell)
     {
         InitializeComponent();
@@ -30,6 +30,7 @@ public partial class ConsultationForm : Form
         }
 
         MessageBox.Show($"Цель консультации достигнута!\n {variable.Name} - {inferredVariable.Value.Value}", "Результаты", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
         OptionGroupBox.Visible = false;
         ButtonsGroupBox.Visible = true;
     }
@@ -40,10 +41,7 @@ public partial class ConsultationForm : Form
         OptionGroupBox.Visible = true;
     }
 
-    private void ShowExplanationButton_Click(object sender, EventArgs e)
-    {
-        MessageBox.Show("Not implemented yet!", "whoops", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-    }
+    private void ShowExplanationButton_Click(object sender, EventArgs e) => _expertSystemShell.ShowExplanation();
 
     private void OptionsComboBox_SelectedIndexChanged(object sender, EventArgs e) => SelectButton.Enabled = OptionsComboBox.SelectedIndex > -1;
 
