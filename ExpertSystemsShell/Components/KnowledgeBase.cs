@@ -65,7 +65,7 @@ public class KnowledgeBase
     /// <returns> String in the format 'Variable[Integer]'. </returns>
     public string GenerateNextVariableName()
     {
-        var number = Rules.Count + 1;
+        var number = Variables.Count + 1;
 
         while (IsVariableNameUsed($"Variable{number}"))
         {
@@ -119,7 +119,7 @@ public class KnowledgeBase
     /// <returns> String in the format 'Domain[Integer]'. </returns>
     public string GenerateNextDomainName()
     {
-        var number = Rules.Count + 1;
+        var number = Domains.Count + 1;
 
         while (IsDomainNameUsed($"Domain{number}"))
         {
