@@ -21,6 +21,8 @@ public class IoComponent
     /// <exception cref="IOException"></exception>
     public KnowledgeBase LoadKnowledgeBase(string path)
     {
+        _path = path;
+
         var formatter = new BinaryFormatter();
         using var stream = new FileStream(path, FileMode.OpenOrCreate);
 

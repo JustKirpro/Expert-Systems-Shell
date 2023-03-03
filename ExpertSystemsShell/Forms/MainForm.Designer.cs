@@ -211,7 +211,6 @@ namespace ExpertSystemsShell.Forms
             this.RulesListView.AllowDrop = true;
             this.RulesListView.FullRowSelect = true;
             this.RulesListView.Location = new System.Drawing.Point(0, 0);
-            this.RulesListView.MultiSelect = false;
             this.RulesListView.Name = "RulesListView";
             this.RulesListView.Size = new System.Drawing.Size(889, 823);
             this.RulesListView.TabIndex = 8;
@@ -351,7 +350,6 @@ namespace ExpertSystemsShell.Forms
             // 
             this.VariablesListView.FullRowSelect = true;
             this.VariablesListView.Location = new System.Drawing.Point(0, 0);
-            this.VariablesListView.MultiSelect = false;
             this.VariablesListView.Name = "VariablesListView";
             this.VariablesListView.Size = new System.Drawing.Size(889, 822);
             this.VariablesListView.TabIndex = 9;
@@ -457,7 +455,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainsTab.Location = new System.Drawing.Point(8, 46);
             this.DomainsTab.Name = "DomainsTab";
             this.DomainsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DomainsTab.Size = new System.Drawing.Size(1476, 826);
+            this.DomainsTab.Size = new System.Drawing.Size(1476, 828);
             this.DomainsTab.TabIndex = 2;
             this.DomainsTab.Text = "Домены";
             this.DomainsTab.UseVisualStyleBackColor = true;
@@ -487,7 +485,6 @@ namespace ExpertSystemsShell.Forms
             // 
             this.DomainsListView.FullRowSelect = true;
             this.DomainsListView.Location = new System.Drawing.Point(-3, 0);
-            this.DomainsListView.MultiSelect = false;
             this.DomainsListView.Name = "DomainsListView";
             this.DomainsListView.Size = new System.Drawing.Size(892, 824);
             this.DomainsListView.TabIndex = 13;

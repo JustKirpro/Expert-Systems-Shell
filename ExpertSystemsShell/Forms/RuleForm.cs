@@ -25,7 +25,6 @@ public partial class RuleForm : Form
     {
         InitializeComponent();
         Text = "Создание правила";
-        OkButton.Enabled = false;
         RuleNameTextBox.Text = knowledgeBase.GenerateNextRuleName();
 
         _knowledgeBase = knowledgeBase;
@@ -41,6 +40,7 @@ public partial class RuleForm : Form
 
         CopyParts(rule.ConditionPart, rule.ActionPart);
         InitializeControls(rule);
+        OkButton.Enabled = true;
     }
 
     #endregion
@@ -118,7 +118,7 @@ public partial class RuleForm : Form
             var item = (ListViewItem)row;
             var fact = (Fact)item.Tag;
 
-            _actionPart.Remove(fact);
+            _conditionPart.Remove(fact);
             ConditionPartListView.Items.Remove(item);
         }
 
@@ -235,6 +235,8 @@ public partial class RuleForm : Form
     }
 
     private void RuleNameTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
+
+    private void ReasonTextBox_TextChanged(object sender, EventArgs e) => UpdateOkButtonAvailability();
 
     #endregion
 

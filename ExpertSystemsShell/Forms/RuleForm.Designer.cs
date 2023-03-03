@@ -146,6 +146,7 @@ namespace ExpertSystemsShell.Forms
             this.ReasonTextBox.Name = "ReasonTextBox";
             this.ReasonTextBox.Size = new System.Drawing.Size(886, 74);
             this.ReasonTextBox.TabIndex = 0;
+            this.ReasonTextBox.TextChanged += new System.EventHandler(this.ReasonTextBox_TextChanged);
             // 
             // OkButton
             // 
