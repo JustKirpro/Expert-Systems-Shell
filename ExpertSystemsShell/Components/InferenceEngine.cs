@@ -9,6 +9,8 @@ public class InferenceEngine
 {
     private readonly KnowledgeBase _knowledgeBase;
 
+    private bool _isCanceled = false;
+
     public WorkingMemory WorkingMemory { get; private set; } = null!;
 
     public InferenceEngine(KnowledgeBase knowledgeBase)
@@ -24,35 +26,35 @@ public class InferenceEngine
     public bool InferGoalVariable(Variable goalVariable)
     {
         WorkingMemory = new WorkingMemory(goalVariable);
+        _isCanceled = false;
         return InferVariable(WorkingMemory.GoalVariable);
     }
 
     private bool InferVariable(Variable variable)
     {
-        var rules = _knowledgeBase.Rules.Where(r => r.ActionPart.Select(f => f.Variable).Contains(variable));
+        var rules = _knowledgeBase.Rules.Where(r => r.ActionPart.Select(f => f.Variable).Contains(variable)).ToList();
 
         foreach (var rule in rules)
         {
-            var inferenceStatus = ProcessConditionPart(rule);
+            var isInferred = ProcessConditionPart(rule);
 
-            switch (inferenceStatus)
+            if (isInferred)
             {
-                case InferenceStatus.NotInferred:
-                    continue;
-                case InferenceStatus.Inferred:
-                    WorkingMemory.VariableValues.AddRange(rule.ActionPart);
-                    WorkingMemory.FiredRules.Add(rule);
-                    return true;
-                case InferenceStatus.Canceled:
-                default:
-                    return false;
+                WorkingMemory.VariableValues.AddRange(rule.ActionPart);
+                WorkingMemory.FiredRules.Add(rule);
+                return true;
+            }
+            
+            if (_isCanceled)
+            {
+                return false;
             }
         }
 
         return false;
     }
 
-    private InferenceStatus ProcessConditionPart(Rule rule)
+    private bool ProcessConditionPart(Rule rule)
     {
         foreach (var fact in rule.ConditionPart)
         {
@@ -66,23 +68,23 @@ public class InferenceEngine
                     continue;
                 }
 
-                return InferenceStatus.NotInferred;
+                return false;
             }
 
             if (!ProcessVariable(currentVariable))
             {
-                return InferenceStatus.Canceled;
+                return false;
             }
 
             storedValue = GetStoredValue(currentVariable)!;
 
             if (!AreValuesMatch(storedValue, fact.Value))
             {
-                return InferenceStatus.NotInferred;
+                return false;
             }
         }
 
-        return InferenceStatus.Inferred;
+        return true;
     }
 
     private bool ProcessVariable(Variable variable) => variable.Type switch
@@ -102,19 +104,14 @@ public class InferenceEngine
             var value = form.Value!;
             var fact = new Fact(variable, value);
             WorkingMemory.VariableValues.Add(fact);
+            return true;
         }
 
-        return result == DialogResult.OK;
+        _isCanceled = true;
+        return false;
     }
 
     private DomainValue? GetStoredValue(Variable variable) => WorkingMemory.GetVariableValue(variable);
 
     private static bool AreValuesMatch(DomainValue storedValue, DomainValue currentValue) => storedValue == currentValue;
-
-    private enum InferenceStatus
-    {
-        Inferred,
-        NotInferred,
-        Canceled
-    }
 }
