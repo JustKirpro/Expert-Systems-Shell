@@ -41,7 +41,7 @@ public class KnowledgeBase
     /// Gets a list of rules that use the passed variable either in the condition or in the action part.
     /// </summary>
     /// <param name="variable"> Variable, the list of rules with which you want to get. </param>
-    /// <returns> List of rules that use passed variable. </returns>
+    /// <returns> List of rules that use the passed variable. </returns>
     public List<Rule> GetRulesByVariable(Variable variable)
     {
         var rules = new List<Rule>();
@@ -54,11 +54,18 @@ public class KnowledgeBase
 
         return rules;
     }
-    
+
+    /// <summary>
+    /// Gets a list of rules that use the passed domain value either in the condition or in the action part.
+    /// </summary>
+    /// <param name="domainValue"> Domain value, the list of rules with which you want to get. </param>
+    /// <returns> List of rules that use the passed domain value. </returns>
+    public List<Rule> GetRulesByDomainValue(DomainValue domainValue) => Rules.Where(r => r.ConditionPart.Concat(r.ActionPart).Any(f => f.Value == domainValue)).ToList();
+
     #endregion
 
     #region Variables
-    
+
     /// <summary>
     /// Generates the next variable name that can be used as a placeholder.
     /// </summary>
@@ -149,13 +156,6 @@ public class KnowledgeBase
     /// <param name="name"> Name of the domain that you want to get. </param>
     /// <returns> Domain instance, which name property matches the passed name. </returns>
     public Domain GetDomainByName(string name) => Domains.First(d => d.Name == name);
-    
-    /// <summary>
-    /// Checks if the passed domain value is used in any rule in the knowledge base.
-    /// </summary>
-    /// <param name="domainValue"> Domain value whose presence in the rules you want to check. </param>
-    /// <returns> True if the passed domain value is used any rules in the knowledge base, otherwise false. </returns>
-    public bool IsDomainValueUsed(DomainValue domainValue) => Rules.Any(r => r.ConditionPart.Concat(r.ActionPart).Any(f => f.Value == domainValue));
 
     #endregion
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ExpertSystemsShell.Entities;
 using ExpertSystemsShell.Forms;
@@ -8,6 +9,8 @@ namespace ExpertSystemsShell.Components;
 public class InferenceEngine
 {
     private readonly KnowledgeBase _knowledgeBase;
+
+    private HashSet<Rule>? _processingRules;
 
     private bool _isCanceled = false;
 
@@ -26,25 +29,35 @@ public class InferenceEngine
     public bool InferGoalVariable(Variable goalVariable)
     {
         WorkingMemory = new WorkingMemory(goalVariable);
+        _processingRules = new HashSet<Rule>();
         _isCanceled = false;
         return InferVariable(WorkingMemory.GoalVariable);
     }
 
     private bool InferVariable(Variable variable)
     {
-        var rules = _knowledgeBase.Rules.Where(r => r.ActionPart.Select(f => f.Variable).Contains(variable)).ToList();
+        var rules = _knowledgeBase.Rules.Where(r => r.ActionPart.Select(f => f.Variable).Contains(variable) && !_processingRules!.Contains(r)).ToList();
 
         foreach (var rule in rules)
         {
+            _processingRules!.Add(rule);
+
             var isInferred = ProcessConditionPart(rule);
 
             if (isInferred)
             {
-                WorkingMemory.VariableValues.AddRange(rule.ActionPart);
+                foreach (var fact in rule.ActionPart)
+                {
+                    WorkingMemory.VariableValues[fact.Variable] = fact.Value;
+                }
+
                 WorkingMemory.FiredRules.Add(rule);
+                _processingRules.Remove(rule);
                 return true;
             }
-            
+
+            _processingRules.Remove(rule);
+
             if (_isCanceled)
             {
                 return false;
@@ -102,8 +115,7 @@ public class InferenceEngine
         if (result == DialogResult.OK)
         {
             var value = form.Value!;
-            var fact = new Fact(variable, value);
-            WorkingMemory.VariableValues.Add(fact);
+            WorkingMemory.VariableValues[variable] = value;
             return true;
         }
 

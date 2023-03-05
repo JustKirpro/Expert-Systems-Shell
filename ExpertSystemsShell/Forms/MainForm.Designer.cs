@@ -98,7 +98,7 @@ namespace ExpertSystemsShell.Forms
             this.MenuConsultation});
             this.MenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip.Name = "MenuStrip";
-            this.MenuStrip.Size = new System.Drawing.Size(1492, 40);
+            this.MenuStrip.Size = new System.Drawing.Size(1720, 40);
             this.MenuStrip.TabIndex = 0;
             this.MenuStrip.Text = "menuStrip1";
             // 
@@ -118,7 +118,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileNew.Name = "MenuFileNew";
             this.MenuFileNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.MenuFileNew.Size = new System.Drawing.Size(343, 44);
+            this.MenuFileNew.Size = new System.Drawing.Size(359, 44);
             this.MenuFileNew.Text = "Новый...";
             this.MenuFileNew.Click += new System.EventHandler(this.MenuFileNew_Click);
             // 
@@ -126,7 +126,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileOpen.Name = "MenuFileOpen";
             this.MenuFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.MenuFileOpen.Size = new System.Drawing.Size(343, 44);
+            this.MenuFileOpen.Size = new System.Drawing.Size(359, 44);
             this.MenuFileOpen.Text = "Открыть...";
             this.MenuFileOpen.Click += new System.EventHandler(this.MenuFileOpen_Click);
             // 
@@ -135,14 +135,14 @@ namespace ExpertSystemsShell.Forms
             this.MenuFileSave.Enabled = false;
             this.MenuFileSave.Name = "MenuFileSave";
             this.MenuFileSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.MenuFileSave.Size = new System.Drawing.Size(343, 44);
+            this.MenuFileSave.Size = new System.Drawing.Size(359, 44);
             this.MenuFileSave.Text = "Сохранить";
             this.MenuFileSave.Click += new System.EventHandler(this.MenuFileSave_Click);
             // 
             // MenuFileSaveAs
             // 
             this.MenuFileSaveAs.Name = "MenuFileSaveAs";
-            this.MenuFileSaveAs.Size = new System.Drawing.Size(343, 44);
+            this.MenuFileSaveAs.Size = new System.Drawing.Size(359, 44);
             this.MenuFileSaveAs.Text = "Сохранить как...";
             this.MenuFileSaveAs.Click += new System.EventHandler(this.MenuFileSaveAs_Click);
             // 
@@ -150,7 +150,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileExit.Name = "MenuFileExit";
             this.MenuFileExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.MenuFileExit.Size = new System.Drawing.Size(343, 44);
+            this.MenuFileExit.Size = new System.Drawing.Size(359, 44);
             this.MenuFileExit.Text = "Выход";
             this.MenuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
             // 
@@ -188,7 +188,7 @@ namespace ExpertSystemsShell.Forms
             this.TabControl.Location = new System.Drawing.Point(0, 40);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(1492, 882);
+            this.TabControl.Size = new System.Drawing.Size(1720, 968);
             this.TabControl.TabIndex = 1;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
@@ -201,7 +201,7 @@ namespace ExpertSystemsShell.Forms
             this.RulesTab.Location = new System.Drawing.Point(8, 46);
             this.RulesTab.Name = "RulesTab";
             this.RulesTab.Padding = new System.Windows.Forms.Padding(3);
-            this.RulesTab.Size = new System.Drawing.Size(1476, 828);
+            this.RulesTab.Size = new System.Drawing.Size(1704, 914);
             this.RulesTab.TabIndex = 0;
             this.RulesTab.Text = "Правила";
             this.RulesTab.UseVisualStyleBackColor = true;
@@ -212,7 +212,7 @@ namespace ExpertSystemsShell.Forms
             this.RulesListView.FullRowSelect = true;
             this.RulesListView.Location = new System.Drawing.Point(0, 0);
             this.RulesListView.Name = "RulesListView";
-            this.RulesListView.Size = new System.Drawing.Size(889, 823);
+            this.RulesListView.Size = new System.Drawing.Size(1114, 910);
             this.RulesListView.TabIndex = 8;
             this.RulesListView.UseCompatibleStateImageBehavior = false;
             this.RulesListView.View = System.Windows.Forms.View.Details;
@@ -224,9 +224,9 @@ namespace ExpertSystemsShell.Forms
             // ActionPartGroupBox
             // 
             this.ActionPartGroupBox.Controls.Add(this.ActionPartListBox);
-            this.ActionPartGroupBox.Location = new System.Drawing.Point(889, 589);
+            this.ActionPartGroupBox.Location = new System.Drawing.Point(1117, 647);
             this.ActionPartGroupBox.Name = "ActionPartGroupBox";
-            this.ActionPartGroupBox.Size = new System.Drawing.Size(587, 239);
+            this.ActionPartGroupBox.Size = new System.Drawing.Size(587, 277);
             this.ActionPartGroupBox.TabIndex = 5;
             this.ActionPartGroupBox.TabStop = false;
             this.ActionPartGroupBox.Text = "Заключение";
@@ -236,18 +236,18 @@ namespace ExpertSystemsShell.Forms
             this.ActionPartListBox.FormattingEnabled = true;
             this.ActionPartListBox.HorizontalScrollbar = true;
             this.ActionPartListBox.ItemHeight = 32;
-            this.ActionPartListBox.Location = new System.Drawing.Point(3, 38);
+            this.ActionPartListBox.Location = new System.Drawing.Point(3, 35);
             this.ActionPartListBox.Name = "ActionPartListBox";
             this.ActionPartListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.ActionPartListBox.Size = new System.Drawing.Size(578, 196);
+            this.ActionPartListBox.Size = new System.Drawing.Size(578, 228);
             this.ActionPartListBox.TabIndex = 1;
             // 
             // ConditionPartGroupBox
             // 
             this.ConditionPartGroupBox.Controls.Add(this.ConditionPartListBox);
-            this.ConditionPartGroupBox.Location = new System.Drawing.Point(889, 253);
+            this.ConditionPartGroupBox.Location = new System.Drawing.Point(1117, 253);
             this.ConditionPartGroupBox.Name = "ConditionPartGroupBox";
-            this.ConditionPartGroupBox.Size = new System.Drawing.Size(587, 330);
+            this.ConditionPartGroupBox.Size = new System.Drawing.Size(587, 401);
             this.ConditionPartGroupBox.TabIndex = 4;
             this.ConditionPartGroupBox.TabStop = false;
             this.ConditionPartGroupBox.Text = "Посылка";
@@ -260,7 +260,7 @@ namespace ExpertSystemsShell.Forms
             this.ConditionPartListBox.Location = new System.Drawing.Point(6, 32);
             this.ConditionPartListBox.Name = "ConditionPartListBox";
             this.ConditionPartListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.ConditionPartListBox.Size = new System.Drawing.Size(575, 292);
+            this.ConditionPartListBox.Size = new System.Drawing.Size(575, 356);
             this.ConditionPartListBox.TabIndex = 0;
             // 
             // EditRuleGroupBox
@@ -268,7 +268,7 @@ namespace ExpertSystemsShell.Forms
             this.EditRuleGroupBox.Controls.Add(this.DeleteRuleButton);
             this.EditRuleGroupBox.Controls.Add(this.EditRuleButton);
             this.EditRuleGroupBox.Controls.Add(this.AddRuleButton);
-            this.EditRuleGroupBox.Location = new System.Drawing.Point(889, 3);
+            this.EditRuleGroupBox.Location = new System.Drawing.Point(1117, 3);
             this.EditRuleGroupBox.Name = "EditRuleGroupBox";
             this.EditRuleGroupBox.Size = new System.Drawing.Size(587, 247);
             this.EditRuleGroupBox.TabIndex = 3;
@@ -320,7 +320,7 @@ namespace ExpertSystemsShell.Forms
             this.VariablesTab.Location = new System.Drawing.Point(8, 46);
             this.VariablesTab.Name = "VariablesTab";
             this.VariablesTab.Padding = new System.Windows.Forms.Padding(3);
-            this.VariablesTab.Size = new System.Drawing.Size(1476, 828);
+            this.VariablesTab.Size = new System.Drawing.Size(1704, 914);
             this.VariablesTab.TabIndex = 1;
             this.VariablesTab.Text = "Переменные";
             this.VariablesTab.UseVisualStyleBackColor = true;
@@ -328,9 +328,9 @@ namespace ExpertSystemsShell.Forms
             // VariableRuleGroupBox
             // 
             this.VariableRuleGroupBox.Controls.Add(this.VariableRuleListBox);
-            this.VariableRuleGroupBox.Location = new System.Drawing.Point(889, 497);
+            this.VariableRuleGroupBox.Location = new System.Drawing.Point(1117, 519);
             this.VariableRuleGroupBox.Name = "VariableRuleGroupBox";
-            this.VariableRuleGroupBox.Size = new System.Drawing.Size(587, 229);
+            this.VariableRuleGroupBox.Size = new System.Drawing.Size(587, 266);
             this.VariableRuleGroupBox.TabIndex = 10;
             this.VariableRuleGroupBox.TabStop = false;
             this.VariableRuleGroupBox.Text = "Используется в правилах:";
@@ -343,7 +343,7 @@ namespace ExpertSystemsShell.Forms
             this.VariableRuleListBox.Location = new System.Drawing.Point(6, 31);
             this.VariableRuleListBox.Name = "VariableRuleListBox";
             this.VariableRuleListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.VariableRuleListBox.Size = new System.Drawing.Size(575, 196);
+            this.VariableRuleListBox.Size = new System.Drawing.Size(575, 228);
             this.VariableRuleListBox.TabIndex = 0;
             // 
             // VariablesListView
@@ -351,7 +351,7 @@ namespace ExpertSystemsShell.Forms
             this.VariablesListView.FullRowSelect = true;
             this.VariablesListView.Location = new System.Drawing.Point(0, 0);
             this.VariablesListView.Name = "VariablesListView";
-            this.VariablesListView.Size = new System.Drawing.Size(889, 822);
+            this.VariablesListView.Size = new System.Drawing.Size(1114, 912);
             this.VariablesListView.TabIndex = 9;
             this.VariablesListView.UseCompatibleStateImageBehavior = false;
             this.VariablesListView.View = System.Windows.Forms.View.Details;
@@ -360,9 +360,9 @@ namespace ExpertSystemsShell.Forms
             // QuestionTextGroupBox
             // 
             this.QuestionTextGroupBox.Controls.Add(this.QuestionListBox);
-            this.QuestionTextGroupBox.Location = new System.Drawing.Point(889, 720);
+            this.QuestionTextGroupBox.Location = new System.Drawing.Point(1117, 778);
             this.QuestionTextGroupBox.Name = "QuestionTextGroupBox";
-            this.QuestionTextGroupBox.Size = new System.Drawing.Size(587, 108);
+            this.QuestionTextGroupBox.Size = new System.Drawing.Size(587, 144);
             this.QuestionTextGroupBox.TabIndex = 6;
             this.QuestionTextGroupBox.TabStop = false;
             this.QuestionTextGroupBox.Text = "Текст вопроса:";
@@ -375,15 +375,15 @@ namespace ExpertSystemsShell.Forms
             this.QuestionListBox.Location = new System.Drawing.Point(6, 34);
             this.QuestionListBox.Name = "QuestionListBox";
             this.QuestionListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.QuestionListBox.Size = new System.Drawing.Size(575, 68);
+            this.QuestionListBox.Size = new System.Drawing.Size(575, 100);
             this.QuestionListBox.TabIndex = 1;
             // 
             // DomainValuesGroupBox
             // 
             this.DomainValuesGroupBox.Controls.Add(this.DomainValuesListBox);
-            this.DomainValuesGroupBox.Location = new System.Drawing.Point(889, 253);
+            this.DomainValuesGroupBox.Location = new System.Drawing.Point(1117, 256);
             this.DomainValuesGroupBox.Name = "DomainValuesGroupBox";
-            this.DomainValuesGroupBox.Size = new System.Drawing.Size(587, 238);
+            this.DomainValuesGroupBox.Size = new System.Drawing.Size(587, 269);
             this.DomainValuesGroupBox.TabIndex = 5;
             this.DomainValuesGroupBox.TabStop = false;
             this.DomainValuesGroupBox.Text = "Значения домена:";
@@ -396,7 +396,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.DomainValuesListBox.Name = "DomainValuesListBox";
             this.DomainValuesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.DomainValuesListBox.Size = new System.Drawing.Size(575, 196);
+            this.DomainValuesListBox.Size = new System.Drawing.Size(575, 228);
             this.DomainValuesListBox.TabIndex = 0;
             // 
             // EditVariableGroupBox
@@ -404,7 +404,7 @@ namespace ExpertSystemsShell.Forms
             this.EditVariableGroupBox.Controls.Add(this.DeleteVariableButton);
             this.EditVariableGroupBox.Controls.Add(this.EditVariableButton);
             this.EditVariableGroupBox.Controls.Add(this.AddVariableButton);
-            this.EditVariableGroupBox.Location = new System.Drawing.Point(889, 3);
+            this.EditVariableGroupBox.Location = new System.Drawing.Point(1117, 3);
             this.EditVariableGroupBox.Name = "EditVariableGroupBox";
             this.EditVariableGroupBox.Size = new System.Drawing.Size(587, 247);
             this.EditVariableGroupBox.TabIndex = 4;
@@ -455,7 +455,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainsTab.Location = new System.Drawing.Point(8, 46);
             this.DomainsTab.Name = "DomainsTab";
             this.DomainsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DomainsTab.Size = new System.Drawing.Size(1476, 828);
+            this.DomainsTab.Size = new System.Drawing.Size(1704, 912);
             this.DomainsTab.TabIndex = 2;
             this.DomainsTab.Text = "Домены";
             this.DomainsTab.UseVisualStyleBackColor = true;
@@ -463,9 +463,9 @@ namespace ExpertSystemsShell.Forms
             // DomainVariableGroupBox
             // 
             this.DomainVariableGroupBox.Controls.Add(this.DomainVariableListBox);
-            this.DomainVariableGroupBox.Location = new System.Drawing.Point(889, 534);
+            this.DomainVariableGroupBox.Location = new System.Drawing.Point(1117, 589);
             this.DomainVariableGroupBox.Name = "DomainVariableGroupBox";
-            this.DomainVariableGroupBox.Size = new System.Drawing.Size(587, 302);
+            this.DomainVariableGroupBox.Size = new System.Drawing.Size(587, 333);
             this.DomainVariableGroupBox.TabIndex = 14;
             this.DomainVariableGroupBox.TabStop = false;
             this.DomainVariableGroupBox.Text = "Используется в переменных:";
@@ -478,7 +478,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainVariableListBox.Location = new System.Drawing.Point(6, 30);
             this.DomainVariableListBox.Name = "DomainVariableListBox";
             this.DomainVariableListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.DomainVariableListBox.Size = new System.Drawing.Size(575, 260);
+            this.DomainVariableListBox.Size = new System.Drawing.Size(575, 292);
             this.DomainVariableListBox.TabIndex = 0;
             // 
             // DomainsListView
@@ -486,7 +486,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainsListView.FullRowSelect = true;
             this.DomainsListView.Location = new System.Drawing.Point(-3, 0);
             this.DomainsListView.Name = "DomainsListView";
-            this.DomainsListView.Size = new System.Drawing.Size(892, 824);
+            this.DomainsListView.Size = new System.Drawing.Size(1114, 910);
             this.DomainsListView.TabIndex = 13;
             this.DomainsListView.UseCompatibleStateImageBehavior = false;
             this.DomainsListView.View = System.Windows.Forms.View.Details;
@@ -495,9 +495,9 @@ namespace ExpertSystemsShell.Forms
             // ValuesGroupBox
             // 
             this.ValuesGroupBox.Controls.Add(this.ValuesListBox);
-            this.ValuesGroupBox.Location = new System.Drawing.Point(889, 268);
+            this.ValuesGroupBox.Location = new System.Drawing.Point(1117, 256);
             this.ValuesGroupBox.Name = "ValuesGroupBox";
-            this.ValuesGroupBox.Size = new System.Drawing.Size(587, 267);
+            this.ValuesGroupBox.Size = new System.Drawing.Size(587, 331);
             this.ValuesGroupBox.TabIndex = 11;
             this.ValuesGroupBox.TabStop = false;
             this.ValuesGroupBox.Text = "Значения домена:";
@@ -510,7 +510,7 @@ namespace ExpertSystemsShell.Forms
             this.ValuesListBox.Location = new System.Drawing.Point(6, 32);
             this.ValuesListBox.Name = "ValuesListBox";
             this.ValuesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.ValuesListBox.Size = new System.Drawing.Size(575, 228);
+            this.ValuesListBox.Size = new System.Drawing.Size(575, 292);
             this.ValuesListBox.TabIndex = 0;
             // 
             // EditDomainGroupBox
@@ -518,7 +518,7 @@ namespace ExpertSystemsShell.Forms
             this.EditDomainGroupBox.Controls.Add(this.DeleteDomainButton);
             this.EditDomainGroupBox.Controls.Add(this.EditDomainButton);
             this.EditDomainGroupBox.Controls.Add(this.AddDomainButton);
-            this.EditDomainGroupBox.Location = new System.Drawing.Point(889, 3);
+            this.EditDomainGroupBox.Location = new System.Drawing.Point(1117, 3);
             this.EditDomainGroupBox.Name = "EditDomainGroupBox";
             this.EditDomainGroupBox.Size = new System.Drawing.Size(587, 247);
             this.EditDomainGroupBox.TabIndex = 10;
@@ -564,7 +564,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1492, 922);
+            this.ClientSize = new System.Drawing.Size(1720, 1008);
             this.Controls.Add(this.TabControl);
             this.Controls.Add(this.MenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;

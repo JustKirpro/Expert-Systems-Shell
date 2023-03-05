@@ -9,11 +9,15 @@ namespace ExpertSystemsShell.Forms;
 
 public partial class ExplanationForm : Form
 {
+    private readonly WorkingMemory _workingMemory;
+
     public ExplanationForm(WorkingMemory workingMemory)
     {
         InitializeComponent();
-        InitializeVariablesListView(workingMemory.VariableValues);
-        InitializeRulesTreeView(workingMemory.GoalVariable, workingMemory.FiredRules);
+
+        _workingMemory= workingMemory;
+        InitializeVariablesListView();
+        InitializeRulesTreeView();
     }
 
     private void RulesButton_Click(object sender, System.EventArgs e)
@@ -44,6 +48,12 @@ public partial class ExplanationForm : Form
             var listViewItem = (ListViewItem)row;
             var variable = (Variable)((listViewItem).Tag);
             listViewItem.BackColor = variables.Contains(variable) ? Color.IndianRed : Color.White;
+
+            if (variable == _workingMemory.GoalVariable)
+            {
+                var font = new Font(DefaultFont, FontStyle.Bold);
+                listViewItem.Font= font;
+            }
         }
     }
 
@@ -59,13 +69,13 @@ public partial class ExplanationForm : Form
         }
     }
 
-    private void InitializeVariablesListView(List<Fact> facts)
+    private void InitializeVariablesListView()
     {
-        foreach (var fact in facts)
+        foreach (var (variable, domainValue) in _workingMemory.VariableValues)
         {
-            var item = VariablesListView.Items.Add(fact.Variable.Name);
-            item.SubItems.Add(fact.Value.Value);
-            item.Tag = fact.Variable;
+            var item = VariablesListView.Items.Add(variable.Name);
+            item.SubItems.Add(domainValue.Value);
+            item.Tag = variable;
         }
 
         VariablesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -77,20 +87,27 @@ public partial class ExplanationForm : Form
         foreach (var row in VariablesListView.Items)
         {
             var listViewItem = (ListViewItem)row;
+            var variable = (Variable)((listViewItem).Tag);
             listViewItem.BackColor = Color.White;
+
+            if (variable == _workingMemory.GoalVariable)
+            {
+                var font = new Font(DefaultFont, FontStyle.Bold);
+                listViewItem.Font = font;
+            }
         }
     }
 
-    private void InitializeRulesTreeView(Variable goalVariable, List<Rule> rules)
+    private void InitializeRulesTreeView()
     {
-        var root = FillTreeView(goalVariable, rules);
+        var root = FillTreeView(_workingMemory.GoalVariable, _workingMemory.FiredRules);
         RulesTreeView.Nodes.Add(root);
     }
 
     private static TreeNode FillTreeView(Variable variable, List<Rule> rules)
     {
         var rule = FindRule(variable, rules)!;
-        var treeNode = new TreeNode(rule.FormattedRule)
+        var treeNode = new TreeNode($"[{rule.Name}] {rule.FormattedRule}")
         { 
             Tag = rule.ActionPart.Select(fact => fact.Variable).ToList()
         };

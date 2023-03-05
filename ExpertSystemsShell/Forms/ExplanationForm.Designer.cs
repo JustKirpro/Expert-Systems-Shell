@@ -41,7 +41,7 @@
             // 
             this.RulesTreeView.Location = new System.Drawing.Point(6, 44);
             this.RulesTreeView.Name = "RulesTreeView";
-            this.RulesTreeView.Size = new System.Drawing.Size(923, 874);
+            this.RulesTreeView.Size = new System.Drawing.Size(1152, 960);
             this.RulesTreeView.TabIndex = 0;
             this.RulesTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.RulesTreeView_AfterSelect);
             // 
@@ -51,10 +51,10 @@
             this.name,
             this.value});
             this.VariablesListView.FullRowSelect = true;
-            this.VariablesListView.Location = new System.Drawing.Point(935, 44);
+            this.VariablesListView.Location = new System.Drawing.Point(1164, 44);
             this.VariablesListView.MultiSelect = false;
             this.VariablesListView.Name = "VariablesListView";
-            this.VariablesListView.Size = new System.Drawing.Size(554, 874);
+            this.VariablesListView.Size = new System.Drawing.Size(554, 960);
             this.VariablesListView.TabIndex = 1;
             this.VariablesListView.UseCompatibleStateImageBehavior = false;
             this.VariablesListView.View = System.Windows.Forms.View.Details;
@@ -73,7 +73,7 @@
             // VariablesLabel
             // 
             this.VariablesLabel.AutoSize = true;
-            this.VariablesLabel.Location = new System.Drawing.Point(935, 9);
+            this.VariablesLabel.Location = new System.Drawing.Point(1164, 9);
             this.VariablesLabel.Name = "VariablesLabel";
             this.VariablesLabel.Size = new System.Drawing.Size(159, 32);
             this.VariablesLabel.TabIndex = 2;
@@ -103,12 +103,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.ClientSize = new System.Drawing.Size(1492, 922);
+            this.ClientSize = new System.Drawing.Size(1720, 1008);
             this.Controls.Add(this.RulesButton);
             this.Controls.Add(this.RulesLabel);
             this.Controls.Add(this.VariablesLabel);
             this.Controls.Add(this.VariablesListView);
             this.Controls.Add(this.RulesTreeView);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "ExplanationForm";

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using ExpertSystemsShell.Components;
 using ExpertSystemsShell.Entities;
+using System.Text;
 
 namespace ExpertSystemsShell.Forms;
 
@@ -83,7 +84,8 @@ public partial class DomainForm : Form
 
         if (IsDomainValueUsed(domainValue))
         {
-            ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется, поэтому его нельзя изменить.");
+            var rulesList = GenerateRulesList(domainValue);
+            ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется в правилах {rulesList}, поэтому его нельзя изменить.");
             return;
         }
 
@@ -111,7 +113,8 @@ public partial class DomainForm : Form
 
             if (IsDomainValueUsed(domainValue))
             {
-                ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется, поэтому его нельзя удалить.");
+                var rulesList = GenerateRulesList(domainValue);
+                ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется в правилах {rulesList}, поэтому его нельзя удалить.");
                 continue;
             }
 
@@ -213,7 +216,20 @@ public partial class DomainForm : Form
 
     private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
 
-    private bool IsDomainValueUsed(DomainValue domainValue) => _knowledgeBase.IsDomainValueUsed(domainValue);
+    private bool IsDomainValueUsed(DomainValue domainValue) => _knowledgeBase.GetRulesByDomainValue(domainValue).Count > 0;
+
+    private string GenerateRulesList(DomainValue domainValue)
+    {
+        var stringBuilder = new StringBuilder();
+        var rules = _knowledgeBase.GetRulesByDomainValue(domainValue);
+
+        foreach (var rule in rules)
+        {
+            stringBuilder.Append($"{rule.Name}, ");
+        }
+
+        return stringBuilder.ToString()[..^2];
+    }
 
     private void InitializeControls(Domain domain)
     {
