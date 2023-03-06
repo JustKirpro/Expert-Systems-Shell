@@ -106,22 +106,18 @@ public partial class DomainForm : Form
 
     private void DeleteButton_Click(object sender, EventArgs e)
     {
-        foreach (var row in ValuesListView.SelectedItems)
+        var item = GetSelectedItem();
+        var domainValue = (DomainValue)item.Tag;
+
+        if (IsDomainValueUsed(domainValue))
         {
-            var item = (ListViewItem)row;
-            var domainValue = (DomainValue)item.Tag;
-
-            if (IsDomainValueUsed(domainValue))
-            {
-                var rulesList = GenerateRulesList(domainValue);
-                ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется в правилах {rulesList}, поэтому его нельзя удалить.");
-                continue;
-            }
-
-            _values.Remove(domainValue);
-            ValuesListView.Items.Remove(item);
+            var rulesList = GenerateRulesList(domainValue);
+            ShowErrorMessageBox($"Значение домена \"{domainValue.Value}\" используется в правилах {rulesList}, поэтому его нельзя удалить.");
+            return;
         }
 
+        _values.Remove(domainValue);
+        ValuesListView.Items.Remove(item);
         UpdateOkButtonAvailability();
     }
 
@@ -134,7 +130,7 @@ public partial class DomainForm : Form
         var isAnyValueSelected = IsAnyValueSelected();
 
         DeleteButton.Enabled = isAnyValueSelected;
-        EditButton.Enabled = isAnyValueSelected && IsValueValid() && IsOnlyOneValueSelected();
+        EditButton.Enabled = isAnyValueSelected && IsValueValid();
     }
 
     private void ValuesListView_ItemDrag(object sender, ItemDragEventArgs e) => DoDragDrop(e.Item!, DragDropEffects.Move);
@@ -211,8 +207,6 @@ public partial class DomainForm : Form
     private bool IsValueValid() => !string.IsNullOrWhiteSpace(GetValue());
 
     private bool IsAnyValueSelected() => ValuesListView.SelectedItems.Count > 0;
-
-    private bool IsOnlyOneValueSelected() => ValuesListView.SelectedItems.Count == 1;
 
     private bool IsAnyValueAdded() => ValuesListView.Items.Count > 0;
 

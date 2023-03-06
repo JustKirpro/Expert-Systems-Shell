@@ -87,7 +87,7 @@ public partial class ExplanationForm : Form
         foreach (var row in VariablesListView.Items)
         {
             var listViewItem = (ListViewItem)row;
-            var variable = (Variable)((listViewItem).Tag);
+            var variable = (Variable)listViewItem.Tag;
             listViewItem.BackColor = Color.White;
 
             if (variable == _workingMemory.GoalVariable)
@@ -104,7 +104,7 @@ public partial class ExplanationForm : Form
         RulesTreeView.Nodes.Add(root);
     }
 
-    private static TreeNode FillTreeView(Variable variable, List<Rule> rules)
+    private static TreeNode FillTreeView(Variable variable, IReadOnlyCollection<Rule> rules)
     {
         var rule = FindRule(variable, rules)!;
         var treeNode = new TreeNode($"[{rule.Name}] {rule.FormattedRule}")
@@ -120,7 +120,7 @@ public partial class ExplanationForm : Form
                 ? FillTreeView(currentVariable, rules)
                 : new TreeNode($"{currentVariable.Name} = {fact.Value.Value} (запрошена у пользователя)")
                 {
-                    Tag = new List<Variable>() { currentVariable }
+                    Tag = new List<Variable> { currentVariable }
                 };
 
             treeNode.Nodes.Add(childNode);

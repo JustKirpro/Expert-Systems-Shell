@@ -12,7 +12,7 @@ public class InferenceEngine
 
     private HashSet<Rule>? _processingRules;
 
-    private bool _isCanceled = false;
+    private bool _isCanceled;
 
     public WorkingMemory WorkingMemory { get; private set; } = null!;
 

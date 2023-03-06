@@ -118,7 +118,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileNew.Name = "MenuFileNew";
             this.MenuFileNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.MenuFileNew.Size = new System.Drawing.Size(359, 44);
+            this.MenuFileNew.Size = new System.Drawing.Size(343, 44);
             this.MenuFileNew.Text = "Новый...";
             this.MenuFileNew.Click += new System.EventHandler(this.MenuFileNew_Click);
             // 
@@ -126,7 +126,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileOpen.Name = "MenuFileOpen";
             this.MenuFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.MenuFileOpen.Size = new System.Drawing.Size(359, 44);
+            this.MenuFileOpen.Size = new System.Drawing.Size(343, 44);
             this.MenuFileOpen.Text = "Открыть...";
             this.MenuFileOpen.Click += new System.EventHandler(this.MenuFileOpen_Click);
             // 
@@ -135,14 +135,14 @@ namespace ExpertSystemsShell.Forms
             this.MenuFileSave.Enabled = false;
             this.MenuFileSave.Name = "MenuFileSave";
             this.MenuFileSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.MenuFileSave.Size = new System.Drawing.Size(359, 44);
+            this.MenuFileSave.Size = new System.Drawing.Size(343, 44);
             this.MenuFileSave.Text = "Сохранить";
             this.MenuFileSave.Click += new System.EventHandler(this.MenuFileSave_Click);
             // 
             // MenuFileSaveAs
             // 
             this.MenuFileSaveAs.Name = "MenuFileSaveAs";
-            this.MenuFileSaveAs.Size = new System.Drawing.Size(359, 44);
+            this.MenuFileSaveAs.Size = new System.Drawing.Size(343, 44);
             this.MenuFileSaveAs.Text = "Сохранить как...";
             this.MenuFileSaveAs.Click += new System.EventHandler(this.MenuFileSaveAs_Click);
             // 
@@ -150,7 +150,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.MenuFileExit.Name = "MenuFileExit";
             this.MenuFileExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.MenuFileExit.Size = new System.Drawing.Size(359, 44);
+            this.MenuFileExit.Size = new System.Drawing.Size(343, 44);
             this.MenuFileExit.Text = "Выход";
             this.MenuFileExit.Click += new System.EventHandler(this.MenuFileExit_Click);
             // 
@@ -211,6 +211,7 @@ namespace ExpertSystemsShell.Forms
             this.RulesListView.AllowDrop = true;
             this.RulesListView.FullRowSelect = true;
             this.RulesListView.Location = new System.Drawing.Point(0, 0);
+            this.RulesListView.MultiSelect = false;
             this.RulesListView.Name = "RulesListView";
             this.RulesListView.Size = new System.Drawing.Size(1114, 910);
             this.RulesListView.TabIndex = 8;
@@ -350,6 +351,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.VariablesListView.FullRowSelect = true;
             this.VariablesListView.Location = new System.Drawing.Point(0, 0);
+            this.VariablesListView.MultiSelect = false;
             this.VariablesListView.Name = "VariablesListView";
             this.VariablesListView.Size = new System.Drawing.Size(1114, 912);
             this.VariablesListView.TabIndex = 9;
@@ -455,7 +457,7 @@ namespace ExpertSystemsShell.Forms
             this.DomainsTab.Location = new System.Drawing.Point(8, 46);
             this.DomainsTab.Name = "DomainsTab";
             this.DomainsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DomainsTab.Size = new System.Drawing.Size(1704, 912);
+            this.DomainsTab.Size = new System.Drawing.Size(1704, 914);
             this.DomainsTab.TabIndex = 2;
             this.DomainsTab.Text = "Домены";
             this.DomainsTab.UseVisualStyleBackColor = true;
@@ -485,6 +487,7 @@ namespace ExpertSystemsShell.Forms
             // 
             this.DomainsListView.FullRowSelect = true;
             this.DomainsListView.Location = new System.Drawing.Point(-3, 0);
+            this.DomainsListView.MultiSelect = false;
             this.DomainsListView.Name = "DomainsListView";
             this.DomainsListView.Size = new System.Drawing.Size(1114, 910);
             this.DomainsListView.TabIndex = 13;

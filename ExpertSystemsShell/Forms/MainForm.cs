@@ -177,24 +177,18 @@ public partial class MainForm : Form
     private void DeleteRuleButton_Click(object sender, EventArgs e)
     {
         var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var item = GetSelectedItem(RulesListView);
+        var rule = (Rule)item.Tag;
 
-        foreach (var row in RulesListView.SelectedItems)
-        {
-            var item = (ListViewItem)row;
-            var rule = (Rule)item.Tag;
-
-            knowledgeBase.Rules.Remove(rule);
-            RulesListView.Items.Remove(item);
-        }
-
+        knowledgeBase.Rules.Remove(rule);
+        RulesListView.Items.Remove(item);
         ResizeListView(RulesListView);
     }
 
     private void RulesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var selectedItemsNumber = RulesListView.SelectedItems.Count;
-        EditRuleButton.Enabled = selectedItemsNumber == 1;
-        DeleteRuleButton.Enabled = selectedItemsNumber > 0;
+        EditRuleButton.Enabled = DeleteRuleButton.Enabled = selectedItemsNumber == 1;
 
         if (selectedItemsNumber == 0)
         {
@@ -327,30 +321,24 @@ public partial class MainForm : Form
     private void DeleteVariableButton_Click(object sender, EventArgs e)
     {
         var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var item = GetSelectedItem(VariablesListView);
+        var variable = (Variable)item.Tag;
 
-        foreach (var row in VariablesListView.SelectedItems)
+        if (knowledgeBase.IsVariableUsed(variable)) 
         {
-            var item = (ListViewItem)row;
-            var variable = (Variable)item.Tag;
-
-            if (knowledgeBase.IsVariableUsed(variable))
-            {
-                ShowErrorMessageBox($"Переменная \"{variable.Name}\" используется, поэтому её нельзя удалить.");
-                continue;
-            }
-
-            knowledgeBase.Variables.Remove(variable);
-            VariablesListView.Items.Remove(item);
+            ShowErrorMessageBox($"Переменная \"{variable.Name}\" используется, поэтому её нельзя удалить.");
+            return;
         }
-        
+
+        knowledgeBase.Variables.Remove(variable);
+        VariablesListView.Items.Remove(item);
         ResizeListView(VariablesListView);
     }
 
     private void VariablesListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var selectedItemsNumber = VariablesListView.SelectedItems.Count;
-        EditVariableButton.Enabled = selectedItemsNumber == 1;
-        DeleteVariableButton.Enabled = selectedItemsNumber > 0;
+        EditVariableButton.Enabled = DeleteVariableButton.Enabled = selectedItemsNumber == 1;
 
         if (selectedItemsNumber == 0)
         {
@@ -449,30 +437,24 @@ public partial class MainForm : Form
     private void DeleteDomainButton_Click(object sender, EventArgs e)
     {
         var knowledgeBase = _expertSystemShell.KnowledgeBase;
+        var item = GetSelectedItem(DomainsListView);
+        var domain = (Domain)item.Tag;
 
-        foreach(var row in DomainsListView.SelectedItems)
+        if (knowledgeBase.IsDomainUsed(domain)) 
         {
-            var item = (ListViewItem)row;
-            var domain = (Domain)item.Tag;
-
-            if (knowledgeBase.IsDomainUsed(domain))
-            {
-                ShowErrorMessageBox($"Домен \"{domain.Name}\" используется, поэтому его нельзя удалить.");
-                continue;
-            }
-
-            knowledgeBase.Domains.Remove(domain);
-            DomainsListView.Items.Remove(item);
+            ShowErrorMessageBox($"Домен \"{domain.Name}\" используется, поэтому его нельзя удалить.");
+            return;
         }
 
+        knowledgeBase.Domains.Remove(domain);
+        DomainsListView.Items.Remove(item);
         ResizeListView(DomainsListView);
     }
 
     private void DomainsListView_SelectedIndexChanged(object sender, EventArgs e)
     {
         var selectedItemsNumber = DomainsListView.SelectedItems.Count;
-        EditDomainButton.Enabled = selectedItemsNumber == 1;
-        DeleteDomainButton.Enabled = selectedItemsNumber > 0;
+        EditDomainButton.Enabled = DeleteDomainButton.Enabled = selectedItemsNumber == 1;
 
         if (selectedItemsNumber == 0)
         {

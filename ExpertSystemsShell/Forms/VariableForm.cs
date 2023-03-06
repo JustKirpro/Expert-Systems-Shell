@@ -140,7 +140,7 @@ public partial class VariableForm : Form
 
     private bool IsQuestionAvailable() => RequestedOption.Checked || InferredRequestedOption.Checked;
 
-    private static bool IsDefaultQuestion(string name) => MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: {GetDefaultQuestion(name)}", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+    private static bool IsDefaultQuestion(string name) => MessageBox.Show($"Вы не ввели вопрос для переменной. Использовать вопрос по умолчанию: \"{GetDefaultQuestion(name)}\"", "Предупреждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
 
     private Domain GetDomain()
     {
